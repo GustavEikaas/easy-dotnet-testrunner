@@ -5,13 +5,14 @@ namespace EasyDotnet.MTP;
 
 public static class MTPHandler
 {
-  public static Task RunDiscoverAsync(IDiscoverRequest request)
+  public static async Task RunDiscoverAsync(DiscoverRequest request)
   {
     if (!File.Exists(request.TestExecutablePath))
     {
       throw new FileNotFoundException("Test executable not found.", request.TestExecutablePath);
     }
-    throw new System.NotImplementedException();
+    var tests = await DiscoverHandler.Discover(request.TestExecutablePath);
+    TestWriter.WriteDiscoveredTests(tests, request.OutFile);
   }
 
   public static Task RunTestsAsync(IRunRequest request)

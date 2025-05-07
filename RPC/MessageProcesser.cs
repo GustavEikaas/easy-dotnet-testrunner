@@ -33,7 +33,7 @@ public static class MessageProcesser
         case MTP_Discover:
           try
           {
-            var mtpDiscover = request.Params.Deserialize<MTP.IDiscoverRequest>(SerializerOptions);
+            var mtpDiscover = request.Params.Deserialize<MTP.DiscoverRequest>(SerializerOptions);
             await MTPHandler.RunDiscoverAsync(mtpDiscover);
             return Messages.Success(request.Id, mtpDiscover.OutFile);
           }
@@ -57,7 +57,7 @@ public static class MessageProcesser
         case VSTest_Discover:
           try
           {
-            var vsTestDiscover = request.Params.Deserialize<DiscoverRequest>(SerializerOptions);
+            var vsTestDiscover = request.Params.Deserialize<VSTest.DiscoverRequest>(SerializerOptions);
             VsTestHandler.RunDiscover(vsTestDiscover);
             return Messages.Success(request.Id, vsTestDiscover.OutFile);
           }

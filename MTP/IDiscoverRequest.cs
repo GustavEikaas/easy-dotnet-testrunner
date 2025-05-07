@@ -1,7 +1,7 @@
 namespace EasyDotnet.MTP;
 
-public interface IDiscoverRequest
+public sealed record DiscoverRequest
 {
-  string TestExecutablePath { get; init; }
-  string OutFile { get; init; }
+  public string TestExecutablePath { get; init; }
+  public string OutFile { get; init; }
 }

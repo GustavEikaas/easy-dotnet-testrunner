@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+
 using EasyDotnet.Types;
+
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -10,7 +12,7 @@ namespace EasyDotnet.VSTest;
 
 public static class DiscoverHandler
 {
-  public static List<Test> Discover(string vsTestConsolePath, string testDllPath)
+  public static List<DiscoveredTest> Discover(string vsTestConsolePath, string testDllPath)
   {
     var options = new TestPlatformOptions
     {

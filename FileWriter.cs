@@ -15,11 +15,11 @@ public static class TestWriter
     WriteIndented = false
   };
 
-  public static void WriteDiscoveredTests(IEnumerable<Test> testList, string outFile)
+  public static void WriteDiscoveredTests(List<DiscoveredTest> testList, string outFile)
   {
     using var writer = new StreamWriter(outFile, false);
 
-    if (!testList.Any())
+    if (testList.Count == 0)
     {
       writer.WriteLine("[]");
     }
