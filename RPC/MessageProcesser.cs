@@ -37,20 +37,22 @@ public static class MessageProcesser
             await MTPHandler.RunDiscoverAsync(mtpDiscover);
             return Messages.Success(request.Id, mtpDiscover.OutFile);
           }
-          catch (Exception)
+          catch (Exception ex)
           {
+            Console.Error.WriteLine(ex.ToString());
             return Messages.InvalidRequest(request.Id);
           }
 
         case MTP_RUN:
           try
           {
-            var mtpRun = request.Params.Deserialize<MTP.IRunRequest>(SerializerOptions);
+            var mtpRun = request.Params.Deserialize<MTP.RunRequest>(SerializerOptions);
             await MTPHandler.RunTestsAsync(mtpRun);
             return Messages.Success(request.Id, mtpRun.OutFile);
           }
-          catch (Exception)
+          catch (Exception ex)
           {
+            Console.Error.WriteLine(ex.ToString());
             return Messages.InvalidRequest(request.Id);
           }
 
@@ -61,8 +63,9 @@ public static class MessageProcesser
             VsTestHandler.RunDiscover(vsTestDiscover);
             return Messages.Success(request.Id, vsTestDiscover.OutFile);
           }
-          catch (Exception)
+          catch (Exception ex)
           {
+            Console.Error.WriteLine(ex.ToString());
             return Messages.InvalidRequest(request.Id);
           }
 
@@ -73,8 +76,9 @@ public static class MessageProcesser
             await VsTestHandler.RunTestsAsync(vsTestRun);
             return Messages.Success(request.Id, vsTestRun.OutFile);
           }
-          catch (Exception)
+          catch (Exception ex)
           {
+            Console.Error.WriteLine(ex.ToString());
             return Messages.InvalidRequest(request.Id);
           }
 

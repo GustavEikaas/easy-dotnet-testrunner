@@ -24,6 +24,7 @@ public static class DiscoverHandler
       return Task.CompletedTask;
     });
     await discoveryResponse.WaitCompletionAsync();
-    return [.. testNodeUpdates.Select(x => x.ToDiscoveredTest())];
+
+    return [.. testNodeUpdates.Where(x => x != null && x.Node != null).Select(x => x.ToDiscoveredTest())];
   }
 }

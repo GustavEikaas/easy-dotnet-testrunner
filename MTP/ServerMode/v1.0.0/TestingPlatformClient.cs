@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EasyDotnet.MTP;
 using EasyDotnet.MTP.ServerMode;
 
 using MSTest.Acceptance.IntegrationTests.Messages.V100;
@@ -153,7 +154,7 @@ public sealed class TestingPlatformClient : IDisposable
         return runListener;
       });
 
-  public async Task<ResponseListener> RunTestsAsync(Guid requestId, TestNode[] filter, Func<TestNodeUpdate[], Task> action)
+  public async Task<ResponseListener> RunTestsAsync(Guid requestId, RunRequestNode[] filter, Func<TestNodeUpdate[], Task> action)
   => await CheckedInvokeAsync(async () =>
   {
     using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromMinutes(3));

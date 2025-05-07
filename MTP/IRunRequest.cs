@@ -1,8 +1,8 @@
 namespace EasyDotnet.MTP;
 
-public interface IRunRequest
+public sealed record RunRequest
 {
-  string TestExecutablePath { get; init; }
-  string Filter { get; init; }
-  string OutFile { get; init; }
+  public string TestExecutablePath { get; init; }
+  public RunRequestNode[] Filter { get; init; }
+  public string OutFile { get; init; }
 }

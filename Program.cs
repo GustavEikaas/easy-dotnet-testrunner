@@ -58,10 +58,9 @@ class Program
             PipeTransmissionMode.Byte,
             PipeOptions.Asynchronous);
 
-        Console.WriteLine("Waiting for client connection...");
         await pipe.WaitForConnectionAsync(token);
 
-        Guid clientId = Guid.NewGuid();
+        var clientId = Guid.NewGuid();
         Console.WriteLine($"Client {clientId} connected");
 
         ActiveConnections[clientId] = pipe;

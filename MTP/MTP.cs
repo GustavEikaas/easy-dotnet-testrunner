@@ -15,8 +15,9 @@ public static class MTPHandler
     TestWriter.WriteDiscoveredTests(tests, request.OutFile);
   }
 
-  public static Task RunTestsAsync(IRunRequest request)
+  public static async Task RunTestsAsync(RunRequest request)
   {
-    throw new System.NotImplementedException();
+    var results = await RunHandler.RunTests(request);
+    TestWriter.WriteTestRunResults(results, request.OutFile);
   }
 }

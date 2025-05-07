@@ -3,12 +3,14 @@
 
 using System;
 
+using EasyDotnet.MTP;
+
 using Newtonsoft.Json;
 
 namespace Microsoft.Testing.Platform.ServerMode.IntegrationTests.Messages.V100;
 
 public sealed record RunRequest(
     [property:JsonProperty("tests")]
-    TestNode[]? TestCases,
+    RunRequestNode[]? TestCases,
     [property:JsonProperty("runId")]
     Guid RunId);

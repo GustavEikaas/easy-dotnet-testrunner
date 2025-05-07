@@ -21,7 +21,7 @@ public sealed record TestNode
     string DisplayName,
 
     [property: JsonProperty("location.namespace")]
-    string TestNamespace,
+    string? TestNamespace,
 
     [property: JsonProperty("location.method")]
     string TestMethod,
