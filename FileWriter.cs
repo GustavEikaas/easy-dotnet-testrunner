@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using EasyDotnet.Types;
 
@@ -12,7 +13,8 @@ public static class TestWriter
   private static readonly JsonSerializerOptions SerializerOptions = new()
   {
     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    WriteIndented = false
+    WriteIndented = false,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
   };
 
   public static void WriteTestRunResults(List<TestRunResult> results, string outFile)
