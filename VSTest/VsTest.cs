@@ -15,7 +15,7 @@ public static class VsTestHandler
     TestWriter.WriteDiscoveredTests(tests, request.OutFile);
   }
 
-  public static Task RunTestsAsync(IRunRequest request)
+  public static Task RunTestsAsync(RunRequest request)
   {
     throw new System.NotImplementedException();
   }

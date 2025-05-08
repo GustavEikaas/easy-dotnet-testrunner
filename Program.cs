@@ -19,7 +19,8 @@ class Program
     var serverTask = StartServerAsync(Cts.Token);
 
     //TODO: There has to be a better way to do this??
-    while(true){
+    while (true)
+    {
 
     }
     Console.ReadKey();
