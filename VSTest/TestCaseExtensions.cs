@@ -12,10 +12,8 @@ public static class TestCaseExtensions
        Id = x.Id.ToString(),
        Namespace = x.FullyQualifiedName,
        Name = x.DisplayName,
-       //TODO: replace all \ with /
-       FilePath = x.CodeFilePath.Replace("\\", "/"),
-       LineNumber = x.LineNumber
+       FilePath = x.CodeFilePath?.Replace("\\", "/"),
+       LineNumber = x.LineNumber,
+       DisplayName = x.DisplayName
      };
-
-
 }

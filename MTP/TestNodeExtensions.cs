@@ -15,6 +15,7 @@ public static class TestNodeExtensions
         FilePath = test.Node?.FilePath?.Replace("\\", "/"),
         LineNumber = test.Node?.LineStart,
         Namespace = test.Node.TestNamespace,
+        DisplayName = test.Node.DisplayName,
         Name = name
       };
   } 
