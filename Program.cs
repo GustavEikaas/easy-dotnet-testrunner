@@ -16,10 +16,12 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
-    Console.WriteLine($"Named pipe server started: {PipeName}");
     var serverTask = StartServerAsync(Cts.Token);
 
     //TODO: There has to be a better way to do this??
+    while(true){
+
+    }
     Console.ReadKey();
     Cts.Cancel();
 
@@ -58,6 +60,7 @@ class Program
             PipeTransmissionMode.Byte,
             PipeOptions.Asynchronous);
 
+        Console.WriteLine($"Named pipe server started: {PipeName}");
         await pipe.WaitForConnectionAsync(token);
 
         var clientId = Guid.NewGuid();
