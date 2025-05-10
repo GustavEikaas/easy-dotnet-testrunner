@@ -4,7 +4,7 @@ namespace EasyDotnet.VSTest;
 
 public static class VsTestHandler
 {
-  public static string RunDiscover(DiscoverRequest request)
+  public static void RunDiscover(DiscoverRequest request)
   {
     var dllPaths = request.Projects.Select(x => x.DllPath).ToArray();
     var discoveredTests = DiscoverHandler.Discover(request.VsTestPath, dllPaths);
@@ -19,7 +19,6 @@ public static class VsTestHandler
         .ToList();
 
     matchedValues.ForEach(x => TestWriter.WriteDiscoveredTests(x.Tests, x.OutFile));
-    return string.Join(",", discoveredTests.Select(x => x.Key).Distinct().ToList());
   }
 
   public static void RunTests(RunRequest request)
