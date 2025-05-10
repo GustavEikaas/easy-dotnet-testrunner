@@ -60,8 +60,8 @@ public static class MessageProcesser
           try
           {
             var vsTestDiscover = request.Params.Deserialize<VSTest.DiscoverRequest>(SerializerOptions);
-            VsTestHandler.RunDiscover(vsTestDiscover);
-            return Messages.Success(request.Id, vsTestDiscover.OutFile);
+            var garbage = VsTestHandler.RunDiscover(vsTestDiscover);
+            return Messages.Success(request.Id, garbage);
           }
           catch (Exception ex)
           {

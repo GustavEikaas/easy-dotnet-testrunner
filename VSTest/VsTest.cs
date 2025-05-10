@@ -1,17 +1,25 @@
-using System.IO;
+using System.Linq;
 
 namespace EasyDotnet.VSTest;
 
 public static class VsTestHandler
 {
-  public static void RunDiscover(DiscoverRequest request)
+  public static string RunDiscover(DiscoverRequest request)
   {
-    if (!File.Exists(request.DllPath) || !File.Exists(request.VsTestPath))
-    {
-      throw new System.Exception("File not found");
-    }
-    var tests = DiscoverHandler.Discover(request.VsTestPath, request.DllPath);
-    TestWriter.WriteDiscoveredTests(tests, request.OutFile);
+    var dllPaths = request.Projects.Select(x => x.DllPath).ToArray();
+    var discoveredTests = DiscoverHandler.Discover(request.VsTestPath, dllPaths);
+
+    var matchedValues = request.Projects
+        .Join(
+            discoveredTests,
+            proj => proj.DllPath,
+            test => test.Key,
+            (proj, test) => new { proj.OutFile, Tests = test.Value}
+        )
+        .ToList();
+
+    matchedValues.ForEach(x => TestWriter.WriteDiscoveredTests(x.Tests, x.OutFile));
+    return string.Join(",", discoveredTests.Select(x => x.Key).Distinct().ToList());
   }
 
   public static void RunTests(RunRequest request)

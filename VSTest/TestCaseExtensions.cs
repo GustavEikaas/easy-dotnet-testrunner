@@ -6,7 +6,7 @@ namespace EasyDotnet.VSTest;
 
 public static class TestCaseExtensions
 {
-  public static DiscoveredTest Map(this TestCase x) =>
+  public static DiscoveredTest ToDiscoveredTest(this TestCase x) =>
      new()
      {
        Id = x.Id.ToString(),
