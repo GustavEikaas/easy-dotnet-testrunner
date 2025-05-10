@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 
 using EasyDotnet.Types;
@@ -14,7 +13,7 @@ namespace EasyDotnet.VSTest;
 
 public static class RunHandler
 {
-  public static List<TestRunResult> RunTests(string vsTestPath, string dllPath, string filter)
+  public static List<TestRunResult> RunTests(string vsTestPath, string dllPath, Guid[] testIds)
   {
     var options = new TestPlatformOptions
     {
@@ -22,14 +21,21 @@ public static class RunHandler
       SkipDefaultAdapters = false
     };
 
-    var r = new VsTestConsoleWrapper(vsTestPath);
+    var discoveryHandler = new PlaygroundTestDiscoveryHandler();
+    var testHost = new VsTestConsoleWrapper(vsTestPath);
     var sessionHandler = new TestSessionHandler();
     var handler = new TestRunHandler();
-    r.RunTests((List<TestCase>)[], null, options, sessionHandler.TestSessionInfo, handler);
-    return handler.Results.Select(x => new TestRunResult() {Duration = (long?) x.Duration.TotalMilliseconds, StackTrace = x.ErrorStackTrace, ErrorMessage = x.ErrorMessage, Id = x.TestCase.Id.ToString(), Outcome = x.Outcome.ToString()}).ToList();
+
+    //TODO: Caching mechanism to prevent rediscovery on each run request.
+    //Alternative check for overloads of RunTests that support both dllPath and testIds
+    testHost.DiscoverTests([dllPath], null, options, sessionHandler.TestSessionInfo, discoveryHandler);
+    var runTests = discoveryHandler.TestCases.Where(x => testIds.Contains(x.Id));
+    testHost.RunTests(runTests, null, options, sessionHandler.TestSessionInfo, handler);
+
+    return [.. handler.Results.Select(x => x.ToTestRunResult())];
   }
 
-  public class TestRunHandler() : ITestRunEventsHandler
+  internal sealed class TestRunHandler() : ITestRunEventsHandler
   {
     public List<TestResult> Results = [];
 

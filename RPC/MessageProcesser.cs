@@ -73,7 +73,7 @@ public static class MessageProcesser
           try
           {
             var vsTestRun = request.Params.Deserialize<VSTest.RunRequest>(SerializerOptions);
-            await VsTestHandler.RunTestsAsync(vsTestRun);
+            VsTestHandler.RunTests(vsTestRun);
             return Messages.Success(request.Id, vsTestRun.OutFile);
           }
           catch (Exception ex)

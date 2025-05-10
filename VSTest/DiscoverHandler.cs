@@ -27,10 +27,10 @@ public static class DiscoverHandler
     var tests = discoveryHandler.TestCases.Select(x => x.Map()).ToList();
     return tests;
   }
+}
 
   public class PlaygroundTestDiscoveryHandler() : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
   {
-
     public List<TestCase> TestCases { get; internal set; } = [];
 
     public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
@@ -50,5 +50,4 @@ public static class DiscoverHandler
 
     public void HandleLogMessage(TestMessageLevel level, string message) { }
     public void HandleRawMessage(string rawMessage) { }
-  }
 }

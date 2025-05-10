@@ -1,8 +1,10 @@
+using System;
+
 namespace EasyDotnet.VSTest;
 
 public sealed record RunRequest(
     string VsTestPath,
     string DllPath,
-    string Filter,
+    Guid[] TestIds,
     string OutFile
     );

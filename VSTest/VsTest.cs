@@ -1,5 +1,4 @@
 using System.IO;
-using System.Threading.Tasks;
 
 namespace EasyDotnet.VSTest;
 
@@ -15,9 +14,10 @@ public static class VsTestHandler
     TestWriter.WriteDiscoveredTests(tests, request.OutFile);
   }
 
-  public static Task RunTestsAsync(RunRequest request)
+  public static void RunTests(RunRequest request)
   {
-    throw new System.NotImplementedException();
+    var testResults = RunHandler.RunTests(request.VsTestPath, request.DllPath, request.TestIds);
+    TestWriter.WriteTestRunResults(testResults, request.OutFile);
   }
 
 }
