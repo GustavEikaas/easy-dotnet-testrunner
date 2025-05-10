@@ -9,16 +9,14 @@ public static class VsTestHandler
     var dllPaths = request.Projects.Select(x => x.DllPath).ToArray();
     var discoveredTests = DiscoverHandler.Discover(request.VsTestPath, dllPaths);
 
-    var matchedValues = request.Projects
+    request.Projects
         .Join(
             discoveredTests,
             proj => proj.DllPath,
-            test => test.Key,
+            test => test.Key.Replace("\\","/"),
             (proj, test) => new { proj.OutFile, Tests = test.Value}
         )
-        .ToList();
-
-    matchedValues.ForEach(x => TestWriter.WriteDiscoveredTests(x.Tests, x.OutFile));
+        .ToList().ForEach(x => TestWriter.WriteDiscoveredTests(x.Tests, x.OutFile));
   }
 
   public static void RunTests(RunRequest request)
