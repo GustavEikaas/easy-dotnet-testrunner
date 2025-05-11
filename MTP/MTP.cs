@@ -5,19 +5,19 @@ namespace EasyDotnet.MTP;
 
 public static class MTPHandler
 {
-  public static async Task RunDiscoverAsync(DiscoverRequest request)
+  public static async Task RunDiscoverAsync(string testExecutablePath, string outFile)
   {
-    if (!File.Exists(request.TestExecutablePath))
+    if (!File.Exists(testExecutablePath))
     {
-      throw new FileNotFoundException("Test executable not found.", request.TestExecutablePath);
+      throw new FileNotFoundException("Test executable not found.", testExecutablePath);
     }
-    var tests = await DiscoverHandler.Discover(request.TestExecutablePath);
-    TestWriter.WriteDiscoveredTests(tests, request.OutFile);
+    var tests = await DiscoverHandler.Discover(testExecutablePath);
+    TestWriter.WriteDiscoveredTests(tests, outFile);
   }
 
-  public static async Task RunTestsAsync(RunRequest request)
+  public static async Task RunTestsAsync(string testExecutablePath, RunRequestNode[] filter, string outFile)
   {
-    var results = await RunHandler.RunTests(request);
-    TestWriter.WriteTestRunResults(results, request.OutFile);
+    var results = await RunHandler.RunTests(testExecutablePath, filter);
+    TestWriter.WriteTestRunResults(results, outFile);
   }
 }

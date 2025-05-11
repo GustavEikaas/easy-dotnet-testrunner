@@ -12,13 +12,13 @@ namespace EasyDotnet.MTP;
 
 public static class RunHandler
 {
-  public static async Task<List<TestRunResult>> RunTests(RunRequest request)
+  public static async Task<List<TestRunResult>> RunTests(string testExecutablePath, RunRequestNode[] filter)
   {
-    using TestingPlatformClient client = await TestingPlatformClientFactory.StartAsServerAndConnectToTheClientAsync(request.TestExecutablePath);
+    using TestingPlatformClient client = await TestingPlatformClientFactory.StartAsServerAndConnectToTheClientAsync(testExecutablePath);
     await client.InitializeAsync();
 
     List<TestNodeUpdate> runResults = [];
-    ResponseListener runRequest = await client.RunTestsAsync(Guid.NewGuid(), [.. request.Filter], node =>
+    ResponseListener runRequest = await client.RunTestsAsync(Guid.NewGuid(), [.. filter], node =>
     {
       runResults.AddRange(node);
       return Task.CompletedTask;
