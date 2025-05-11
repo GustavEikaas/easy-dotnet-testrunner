@@ -29,7 +29,7 @@ jobs:
 
       - name: Push to NuGet (ignore conflict errors)
         run: |
-          dotnet nuget push bin/Release/*.nupkg \
+          dotnet nuget push EasyDotnet.Tool/bin/Release/*.nupkg \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
