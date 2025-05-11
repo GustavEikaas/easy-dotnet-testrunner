@@ -8,7 +8,7 @@ using EasyDotnet;
 using StreamJsonRpc;
 class Program
 {
-  private const string PipeName = "EasyDotnetPipe";
+  private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {
@@ -22,18 +22,15 @@ class Program
     var clientId = 0;
     while (true)
     {
-      /* await Console.Error.WriteAsync("Waiting for client to make a connection..."); */
-
       var stream = new NamedPipeServerStream(PipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
       Console.WriteLine($"Named pipe server started: {PipeName}");
       await stream.WaitForConnectionAsync();
-      Task nowait = RespondToRpcRequestsAsync(stream, ++clientId);
+      _ = RespondToRpcRequestsAsync(stream, ++clientId);
     }
   }
 
   private static async Task RespondToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
   {
-    await Console.Error.WriteLineAsync($"Connection request #{clientId} received. Spinning off an async Task to cater to requests.");
     var jsonRpc = JsonRpc.Attach(stream, new Server());
     if(true == true){
       var ts = jsonRpc.TraceSource;
