@@ -20,18 +20,18 @@ namespace EasyDotnet.MTP.ServerMode;
 
 public partial /* for codegen regx */ class TestingPlatformClientFactory
 {
-  private static readonly string Root = RootFinder.Find();
-  private static readonly Dictionary<string, string> DefaultEnvironmentVariables = new()
-    {
-        { "DOTNET_ROOT", $"{Root}/.dotnet" },
-        { "DOTNET_INSTALL_DIR", $"{Root}/.dotnet" },
-        { "DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "1" },
-        { "DOTNET_MULTILEVEL_LOOKUP", "0" },
-    };
+  // private static readonly string Root = RootFinder.Find();
+  // private static readonly Dictionary<string, string> DefaultEnvironmentVariables = new()
+  //   {
+  //       { "DOTNET_ROOT", $"{Root}/.dotnet" },
+  //       { "DOTNET_INSTALL_DIR", $"{Root}/.dotnet" },
+  //       { "DOTNET_SKIP_FIRST_TIME_EXPERIENCE", "1" },
+  //       { "DOTNET_MULTILEVEL_LOOKUP", "0" },
+  //   };
 
   public static async Task<TestingPlatformClient> StartAsServerAndConnectToTheClientAsync(string testApp)
   {
-    var environmentVariables = new Dictionary<string, string>(DefaultEnvironmentVariables);
+    var environmentVariables = new Dictionary<string, string>();
     foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
     {
       // Skip all unwanted environment variables.
@@ -80,11 +80,9 @@ public partial /* for codegen regx */ class TestingPlatformClientFactory
   }
 }
 
-public sealed class ProcessConfiguration
+public sealed class ProcessConfiguration(string fileName)
 {
-  public ProcessConfiguration(string fileName) => FileName = fileName;
-
-  public string FileName { get; }
+  public string FileName { get; } = fileName;
 
   public string Arguments { get; init; }
 
@@ -391,26 +389,4 @@ public static class WellKnownEnvironmentVariables
         // Isolate from the skip banner in case of parent, children tests
         "TESTINGPLATFORM_CONSOLEOUTPUTDEVICE_SKIP_BANNER"
   ];
-}
-
-public static class RootFinder
-{
-  public static string Find()
-  {
-    string path = AppContext.BaseDirectory;
-    string dir = path;
-    while (Directory.GetDirectoryRoot(dir) != dir)
-    {
-      if (Directory.Exists(Path.Combine(dir, ".git")))
-      {
-        return dir;
-      }
-      else
-      {
-        dir = Directory.GetParent(dir)!.ToString();
-      }
-    }
-
-    throw new InvalidOperationException($"Could not find solution root, .git not found in {path} or any parent directory.");
-  }
 }
