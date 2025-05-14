@@ -1,11 +1,9 @@
 name: 📦Publish .NET Tool to NuGet
 
 on:
-  pull_request:
-  
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
   publish:
