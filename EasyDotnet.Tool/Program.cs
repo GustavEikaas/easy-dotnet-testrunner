@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using EasyDotnet;
@@ -12,6 +14,13 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
+    if(args.Contains("-v")){
+      var assembly = Assembly.GetExecutingAssembly();
+      var version = assembly.GetName().Version; // AssemblyVersion
+      Console.WriteLine($"Assembly Version: {version}");
+      return 0;
+    }
+
     await StartServerAsync();
 
     return 0;
