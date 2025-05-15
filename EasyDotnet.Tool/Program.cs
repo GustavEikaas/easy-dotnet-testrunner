@@ -10,7 +10,8 @@ using EasyDotnet;
 using StreamJsonRpc;
 class Program
 {
-  private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
+  // private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
+  private static readonly string PipeName = "EasyDotnetPipe_";
 
   public static async Task<int> Main(string[] args)
   {

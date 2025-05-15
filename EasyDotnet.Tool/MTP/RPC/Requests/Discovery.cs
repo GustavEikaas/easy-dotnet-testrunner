@@ -1,3 +1,5 @@
+using System;
+
 using Newtonsoft.Json;
 
 namespace EasyDotnet.Playground.RPC.Requests;

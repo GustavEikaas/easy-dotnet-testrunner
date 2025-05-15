@@ -1,5 +1,8 @@
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+
+using EasyDotnet.Playground.RPC;
 
 namespace EasyDotnet.MTP;
 
@@ -11,13 +14,18 @@ public static class MTPHandler
     {
       throw new FileNotFoundException("Test executable not found.", testExecutablePath);
     }
-    var tests = await DiscoverHandler.Discover(testExecutablePath);
+
+    await using var client = await Client.CreateAsync(testExecutablePath);
+    var discovered = await client.DiscoverTestsAsync();
+    var tests = discovered.Where(x => x != null && x.Node != null).Select(x => x.ToDiscoveredTest()).ToList();
     TestWriter.WriteDiscoveredTests(tests, outFile);
   }
 
   public static async Task RunTestsAsync(string testExecutablePath, RunRequestNode[] filter, string outFile)
   {
-    var results = await RunHandler.RunTests(testExecutablePath, filter);
+    await using var client = await Client.CreateAsync(testExecutablePath);
+    var runResults = await client.RunTestsAsync(filter);
+    var results = runResults.Where(x => x.Node.ExecutionState != "in-progress").Select(x => x.ToTestRunResult()).ToList();
     TestWriter.WriteTestRunResults(results, outFile);
   }
 }

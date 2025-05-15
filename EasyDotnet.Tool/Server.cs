@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+
 using EasyDotnet.MTP;
 using EasyDotnet.VSTest;
 
@@ -7,18 +8,24 @@ using StreamJsonRpc;
 
 namespace EasyDotnet;
 
+#pragma warning disable IDE1006 // Naming Styles
+//TODO: figure out how to automatically serialize output
+public sealed record FileResult(string outFile);
+
 internal class Server
 {
   [JsonRpcMethod("mtp/discover")]
-  public static async Task<string> MtpDiscover(string testExecutablePath, string outFile){
+  public static async Task<FileResult> MtpDiscover(string testExecutablePath, string outFile)
+  {
     await MTPHandler.RunDiscoverAsync(testExecutablePath, outFile);
-    return outFile;
+    return new FileResult(outFile);
   }
 
   [JsonRpcMethod("mtp/run")]
-  public static async Task<string> MtpRun(string testExecutablePath, RunRequestNode[] filter, string outFile){
+  public static async Task<FileResult> MtpRun(string testExecutablePath, RunRequestNode[] filter, string outFile)
+  {
     await MTPHandler.RunTestsAsync(testExecutablePath, filter, outFile);
-    return outFile;
+    return new FileResult(outFile);
   }
 
   [JsonRpcMethod("vstest/discover")]
@@ -29,9 +36,9 @@ internal class Server
   }
 
   [JsonRpcMethod("vstest/run")]
-  public static string VsTestRun(string vsTestPath, string dllPath, Guid[] testIds, string outFile)
+  public static FileResult VsTestRun(string vsTestPath, string dllPath, Guid[] testIds, string outFile)
   {
     VsTestHandler.RunTests(vsTestPath, dllPath, testIds, outFile);
-    return outFile;
+    return new FileResult(outFile);
   }
 }

@@ -1,4 +1,6 @@
-using EasyDotnet.Playground.RPC.Models;
+using System;
+
+using EasyDotnet.MTP;
 
 using Newtonsoft.Json;
 
@@ -6,6 +8,6 @@ namespace EasyDotnet.Playground.RPC.Requests;
 
 public sealed record RunRequest(
   [property:JsonProperty("tests")]
-  TestNode[]? TestCases,
+  RunRequestNode[]? TestCases,
   [property:JsonProperty("runId")]
   Guid RunId);

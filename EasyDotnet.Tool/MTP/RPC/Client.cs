@@ -1,7 +1,12 @@
+using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
+using EasyDotnet.MTP;
 using EasyDotnet.Playground.RPC.Models;
 using EasyDotnet.Playground.RPC.Requests;
 using EasyDotnet.Playground.RPC.Response;
@@ -38,6 +43,7 @@ public class Client : IAsyncDisposable
     var processConfig = new ProcessConfiguration(testExePath)
     {
       Arguments = $"--server --client-host localhost --client-port {port} --diagnostic --diagnostic-verbosity trace",
+
       OnStandardOutput = (_, output) =>
       {
         if (debug)
@@ -49,7 +55,7 @@ public class Client : IAsyncDisposable
       OnExit = (_, exitCode) =>
       {
         if (exitCode == 0) return;
-        Console.Error.WriteLine($"OnExit: exit code '{exitCode}'");
+        Console.Error.WriteLine($"[{testExePath}]: exit code '{exitCode}'");
       }
     };
 
@@ -65,7 +71,6 @@ public class Client : IAsyncDisposable
 
     if (debug)
     {
-
       var ts = jsonRpc.TraceSource;
       ts.Switch.Level = SourceLevels.Verbose;
       ts.Listeners.Add(new ConsoleTraceListener());
@@ -92,7 +97,7 @@ public class Client : IAsyncDisposable
     return await tcs.Task ?? throw new Exception("Server didn't respond");
   }
 
-  public async Task<TestNodeUpdate[]> RunTestsAsync(TestNode[] filter)
+  public async Task<TestNodeUpdate[]> RunTestsAsync(RunRequestNode[] filter)
   {
     var runId = Guid.NewGuid();
     var tcs = new TaskCompletionSource<TestNodeUpdate[]>();
@@ -104,11 +109,12 @@ public class Client : IAsyncDisposable
     );
 
     var tests = await tcs.Task ?? throw new Exception("Server didn't respond");
-    return [.. tests.Where(x => x.Node.ExecutionState != "in-progress")];
+    return [.. tests.ToList().Where(x => x.Node.ExecutionState != "in-progress")];
   }
 
   public async ValueTask DisposeAsync()
   {
+    Console.WriteLine("Disposing...");
     await _jsonRpc.NotifyWithParameterObjectAsync("exit", new object());
     _jsonRpc.Dispose();
     _tcpClient.Dispose();
@@ -116,4 +122,5 @@ public class Client : IAsyncDisposable
     _processHandle.Dispose();
     GC.SuppressFinalize(this);
   }
+
 }
