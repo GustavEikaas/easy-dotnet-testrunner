@@ -119,17 +119,17 @@ public sealed class ProcessConfiguration(string fileName)
 {
   public string FileName { get; } = fileName;
 
-  public string Arguments { get; init; }
+  public required string Arguments { get; init; }
 
-  public string WorkingDirectory { get; init; }
+  public string? WorkingDirectory { get; init; }
 
-  public IDictionary<string, string> EnvironmentVariables { get; init; }
+  public IDictionary<string, string>? EnvironmentVariables { get; init; }
 
-  public Action<IProcessHandle, string> OnErrorOutput { get; init; }
+  public Action<IProcessHandle, string>? OnErrorOutput { get; init; }
 
-  public Action<IProcessHandle, string> OnStandardOutput { get; init; }
+  public Action<IProcessHandle, string>? OnStandardOutput { get; init; }
 
-  public Action<IProcessHandle, int> OnExit { get; init; }
+  public Action<IProcessHandle, int>? OnExit { get; init; }
 }
 
 public interface IProcessHandle

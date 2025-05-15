@@ -8,11 +8,11 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
-    var client = new Client(TestExe);
-    await client.Initialize();
-    var tests = await client.RunTestsAsync();
-    Console.WriteLine($"Ran {tests.Length} tests");
-    await client.Terminate();
+    await using var client = await Client.CreateAsync(TestExe);
+    var discovered = await client.DiscoverTestsAsync();
+    Console.WriteLine($"Discovered {discovered.Length} tests");
+    var testResults = await client.RunTestsAsync([.. discovered.Select(x => x.Node)]);
+    Console.WriteLine($"Ran {testResults.Length} tests");
     return 0;
   }
 

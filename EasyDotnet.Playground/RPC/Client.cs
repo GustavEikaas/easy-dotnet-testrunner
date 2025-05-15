@@ -1,8 +1,6 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 using EasyDotnet.Playground.RPC.Models;
 using EasyDotnet.Playground.RPC.Requests;
@@ -12,122 +10,110 @@ using StreamJsonRpc;
 
 namespace EasyDotnet.Playground.RPC;
 
-public class Client(string testExePath)
+public class Client : IAsyncDisposable
 {
-  private JsonRpc? _jsonRpc;
-  private IProcessHandle? _processHandle;
-  private TcpClient? _tcpClient;
-  private Server _server = new();
+  private readonly JsonRpc _jsonRpc;
+  private readonly TcpClient _tcpClient;
+  private readonly IProcessHandle _processHandle;
+  private readonly Server _server;
 
-  public async Task Initialize()
+  private Client(JsonRpc jsonRpc, TcpClient tcpClient, IProcessHandle processHandle, Server server)
   {
-
-    TcpListener tcpListener = new(IPAddress.Loopback, 0);
-    tcpListener.Start();
-    StringBuilder builder = new();
-    Console.WriteLine("Listening on port: " + ((IPEndPoint)tcpListener.LocalEndpoint).Port);
-    ProcessConfiguration processConfig = new(testExePath)
-    {
-      // OnStandardOutput = (_, output) => builder.AppendLine(CultureInfo.InvariantCulture, $"OnStandardOutput:\n{output}"),
-      OnStandardOutput = (_, output) => Console.WriteLine(output),
-      OnErrorOutput = (_, output) => builder.AppendLine(CultureInfo.InvariantCulture, $"OnErrorOutput:\n{output}"),
-      OnExit = (_, exitCode) => builder.AppendLine(CultureInfo.InvariantCulture, $"OnExit: exit code '{exitCode}'"),
-      // Arguments = $"--server --client-host localhost --client-port {((IPEndPoint)tcpListener.LocalEndpoint).Port}",
-      Arguments = $"--server --client-host localhost --client-port {((IPEndPoint)tcpListener.LocalEndpoint).Port} --diagnostic --diagnostic-verbosity trace",
-      // EnvironmentVariables = environmentVariables,
-    };
-
-    IProcessHandle processHandle = ProcessFactory.Start(processConfig, cleanDefaultEnvironmentVariableIfCustomAreProvided: false);
-
-    TcpClient tcpClient;
-    using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromSeconds(60));
-    try
-    {
-      tcpClient = await tcpListener.AcceptTcpClientAsync(cancellationTokenSource.Token);
-    }
-    catch (OperationCanceledException ex) when (ex.CancellationToken == cancellationTokenSource.Token)
-    {
-      throw new OperationCanceledException($"Timeout on connection for command line '{processConfig.FileName} {processConfig.Arguments}'\n{builder}", ex, cancellationTokenSource.Token);
-    }
-
-    if (tcpClient.Connected)
-    {
-      Console.WriteLine("Client connected");
-    }
-
-
-    var stream = tcpClient.GetStream();
-    _jsonRpc = new JsonRpc(stream);
+    _jsonRpc = jsonRpc;
     _tcpClient = tcpClient;
     _processHandle = processHandle;
+    _server = server;
+  }
 
+  public static async Task<Client> CreateAsync(string testExePath, bool debug = false)
+  {
+    var tcpListener = new TcpListener(IPAddress.Loopback, 0);
+    tcpListener.Start();
 
-    if (true == true)
+    var port = ((IPEndPoint)tcpListener.LocalEndpoint).Port;
+    Console.WriteLine($"Listening on port: {port}");
+
+    var server = new Server();
+
+    var processConfig = new ProcessConfiguration(testExePath)
     {
-      var ts = _jsonRpc.TraceSource;
+      Arguments = $"--server --client-host localhost --client-port {port} --diagnostic --diagnostic-verbosity trace",
+      OnStandardOutput = (_, output) =>
+      {
+        if (debug)
+        {
+          Console.WriteLine(output);
+        }
+      },
+      OnErrorOutput = (_, output) => Console.Error.WriteLine(output),
+      OnExit = (_, exitCode) =>
+      {
+        if (exitCode == 0) return;
+        Console.Error.WriteLine($"OnExit: exit code '{exitCode}'");
+      }
+    };
+
+    var processHandle = ProcessFactory.Start(processConfig, false);
+
+    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+    var tcpClient = await tcpListener.AcceptTcpClientAsync(cts.Token);
+
+    Console.WriteLine("Client connected");
+
+    var stream = tcpClient.GetStream();
+    var jsonRpc = new JsonRpc(stream);
+
+    if (debug)
+    {
+
+      var ts = jsonRpc.TraceSource;
       ts.Switch.Level = SourceLevels.Verbose;
       ts.Listeners.Add(new ConsoleTraceListener());
     }
 
+    jsonRpc.AddLocalRpcTarget(server, new JsonRpcTargetOptions { MethodNameTransform = CommonMethodNameTransforms.CamelCase });
+    jsonRpc.StartListening();
 
-    _jsonRpc.AddLocalRpcTarget(_server,
-        new JsonRpcTargetOptions
-        {
-          MethodNameTransform = CommonMethodNameTransforms.CamelCase,
-        }
+    await jsonRpc.InvokeWithParameterObjectAsync<InitializeResponse>(
+      "initialize",
+      new InitializeRequest(Environment.ProcessId, new("easy-dotnet"), new(new(DebuggerProvider: false)))
     );
-    _jsonRpc.StartListening();
-    var res = await _jsonRpc.InvokeWithParameterObjectAsync<InitializeResponse>("initialize", new InitializeRequest(Environment.ProcessId, new("easy-dotnet"), new(new(DebuggerProvider: false))));
+
+    return new Client(jsonRpc, tcpClient, processHandle, server);
   }
 
   public async Task<TestNodeUpdate[]> DiscoverTestsAsync()
   {
-    if (_jsonRpc is null)
-    {
-      throw new InvalidOperationException("Initialize must be called first");
-    }
-
     var runId = Guid.NewGuid();
-    var discoverTask = new TaskCompletionSource<TestNodeUpdate[]>();
-    _server.RegisterResponseListener(runId, discoverTask);
+    var tcs = new TaskCompletionSource<TestNodeUpdate[]>();
+    _server.RegisterResponseListener(runId, tcs);
 
     await _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>("testing/discoverTests", new DiscoveryRequest(runId));
-    var tests = await discoverTask.Task ?? throw new Exception("Server didnt respond??");
-
-    return tests;
+    return await tcs.Task ?? throw new Exception("Server didn't respond");
   }
 
-  public async Task<TestNodeUpdate[]> RunTestsAsync()
+  public async Task<TestNodeUpdate[]> RunTestsAsync(TestNode[] filter)
   {
-    if (_jsonRpc is null)
-    {
-      throw new InvalidOperationException("Initialize must be called first");
-    }
-    var tests = await DiscoverTestsAsync();
-
     var runId = Guid.NewGuid();
-    var runTask = new TaskCompletionSource<TestNodeUpdate[]>();
-    _server.RegisterResponseListener(runId, runTask);
+    var tcs = new TaskCompletionSource<TestNodeUpdate[]>();
+    _server.RegisterResponseListener(runId, tcs);
 
-    await _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>("testing/runTests", new RunRequest([.. tests.Select(x => x.Node)], runId));
-    var runResult = await runTask.Task ?? throw new Exception("Server didnt respond??");
+    await _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>(
+      "testing/runTests",
+      new RunRequest(filter, runId)
+    );
 
-    return tests;
+    var tests = await tcs.Task ?? throw new Exception("Server didn't respond");
+    return [.. tests.Where(x => x.Node.ExecutionState != "in-progress")];
   }
 
-  public async Task Terminate()
+  public async ValueTask DisposeAsync()
   {
-    if (_jsonRpc is null)
-    {
-      throw new InvalidOperationException("Initialize must be called first");
-    }
-
     await _jsonRpc.NotifyWithParameterObjectAsync("exit", new object());
-
     _jsonRpc.Dispose();
-    _tcpClient?.Dispose();
-    _processHandle?.WaitForExit();
-    _processHandle?.Dispose();
+    _tcpClient.Dispose();
+    _processHandle.WaitForExit();
+    _processHandle.Dispose();
+    GC.SuppressFinalize(this);
   }
-
 }

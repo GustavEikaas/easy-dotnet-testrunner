@@ -50,14 +50,14 @@ internal class Server
   [JsonRpcMethod("telemetry/update", UseSingleObjectParameterDeserialization = true)]
   public Task TelemetryAsync(TelemetryPayload telemetry)
   {
-    Console.WriteLine("telemetry/update");
+    // Console.WriteLine("telemetry/update");
     return Task.CompletedTask;
   }
 
   [JsonRpcMethod("client/log")]
   public Task LogAsync(LogLevel level, string message)
   {
-    Console.WriteLine("client/log");
+    // Console.WriteLine("client/log");
     return Task.CompletedTask;
   }
 
