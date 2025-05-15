@@ -1,6 +1,6 @@
 using System;
 
-namespace EasyDotnet.Playground.Extensions;
+namespace EasyDotnet.Extensions;
 
 public static class StringExtensions
 {

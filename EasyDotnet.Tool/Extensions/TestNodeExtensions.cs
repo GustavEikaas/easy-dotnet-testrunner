@@ -1,7 +1,7 @@
 using EasyDotnet.Playground.RPC.Models;
 using EasyDotnet.Types;
 
-namespace EasyDotnet.MTP;
+namespace EasyDotnet.Extensions;
 
 public static class TestNodeExtensions
 {

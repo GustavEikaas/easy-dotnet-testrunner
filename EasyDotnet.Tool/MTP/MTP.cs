@@ -2,6 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+using EasyDotnet.Extensions;
 using EasyDotnet.Playground.RPC;
 
 namespace EasyDotnet.MTP;

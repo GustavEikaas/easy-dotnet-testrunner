@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-using EasyDotnet.Playground.Extensions;
+using EasyDotnet.Extensions;
 
-namespace EasyDotnet.Playground;
+
+namespace EasyDotnet.MTP;
 
 public static class ProcessFactory
 {
