@@ -10,14 +10,13 @@ using EasyDotnet;
 using StreamJsonRpc;
 class Program
 {
-  // private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
-  private static readonly string PipeName = "EasyDotnetPipe_";
+  private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {
     if(args.Contains("-v")){
       var assembly = Assembly.GetExecutingAssembly();
-      var version = assembly.GetName().Version; // AssemblyVersion
+      var version = assembly.GetName().Version;
       Console.WriteLine($"Assembly Version: {version}");
       return 0;
     }
