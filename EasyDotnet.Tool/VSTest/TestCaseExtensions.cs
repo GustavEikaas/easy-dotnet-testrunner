@@ -6,16 +6,19 @@ namespace EasyDotnet.VSTest;
 
 public static class TestCaseExtensions
 {
-  public static DiscoveredTest ToDiscoveredTest(this TestCase x) =>
-     new()
+  public static DiscoveredTest ToDiscoveredTest(this TestCase x){
+    var name = x.DisplayName.Contains('.') ? x.DisplayName : x.FullyQualifiedName;
+    return new()
      {
        Id = x.Id.ToString(),
        Namespace = x.FullyQualifiedName,
-       Name = x.DisplayName,
+       Name = name,
        FilePath = x.CodeFilePath?.Replace("\\", "/"),
        LineNumber = x.LineNumber,
        DisplayName = x.DisplayName
      };
+  }
+     
 
   public static TestRunResult ToTestRunResult(this TestResult x){
 
