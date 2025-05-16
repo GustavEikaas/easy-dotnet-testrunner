@@ -19,6 +19,9 @@ internal class Server
   public void RegisterResponseListener(Guid runId, TaskCompletionSource<TestNodeUpdate[]> task)
       => _ = _listeners.TryAdd(runId, task);
 
+  public void RemoveResponseListener(Guid runId)
+      => _ = _listeners.TryRemove(runId, out _);
+
   [JsonRpcMethod("client/attachDebugger", UseSingleObjectParameterDeserialization = true)]
   public static Task AttachDebuggerAsync(AttachDebuggerInfo attachDebuggerInfo) => throw new NotImplementedException();
 

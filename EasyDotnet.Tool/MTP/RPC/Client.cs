@@ -53,7 +53,12 @@ public class Client : IAsyncDisposable
       OnErrorOutput = (_, output) => Console.Error.WriteLine(output),
       OnExit = (_, exitCode) =>
       {
-        if (exitCode == 0) return;
+        if (exitCode == 0)
+        {
+          return;
+        }
+
+
         Console.Error.WriteLine($"[{testExePath}]: exit code '{exitCode}'");
       }
     };
@@ -86,30 +91,59 @@ public class Client : IAsyncDisposable
     return new Client(jsonRpc, tcpClient, processHandle, server);
   }
 
-  public async Task<TestNodeUpdate[]> DiscoverTestsAsync()
+  public async Task<TestNodeUpdate[]> DiscoverTestsAsync(CancellationToken cancellationToken = default)
   {
     var runId = Guid.NewGuid();
-    var tcs = new TaskCompletionSource<TestNodeUpdate[]>();
-    _server.RegisterResponseListener(runId, tcs);
 
-    await _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>("testing/discoverTests", new DiscoveryRequest(runId));
-    return await tcs.Task ?? throw new Exception("Server didn't respond");
+    return await WithCancellation(
+           runId,
+           () => _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>(
+               "testing/discoverTests", new DiscoveryRequest(runId), cancellationToken),
+           cancellationToken
+       );
   }
 
-  public async Task<TestNodeUpdate[]> RunTestsAsync(RunRequestNode[] filter)
+  public async Task<TestNodeUpdate[]> RunTestsAsync(RunRequestNode[] filter, CancellationToken cancellationToken)
   {
     var runId = Guid.NewGuid();
-    var tcs = new TaskCompletionSource<TestNodeUpdate[]>();
+
+    var tests = await WithCancellation(
+           runId,
+           () => _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>(
+               "testing/runTests", new RunRequest(filter, runId), cancellationToken),
+           cancellationToken
+       );
+
+    return [.. tests.Where(x => x.Node.ExecutionState != "in-progress")];
+  }
+
+private async Task<TestNodeUpdate[]> WithCancellation(
+    Guid runId,
+    Func<Task> invokeRpcAsync,
+    CancellationToken cancellationToken)
+{
+    var tcs = new TaskCompletionSource<TestNodeUpdate[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+
     _server.RegisterResponseListener(runId, tcs);
 
-    await _jsonRpc.InvokeWithParameterObjectAsync<DiscoveryResponse>(
-      "testing/runTests",
-      new RunRequest(filter, runId)
-    );
-
-    var tests = await tcs.Task ?? throw new Exception("Server didn't respond");
-    return [.. tests.ToList().Where(x => x.Node.ExecutionState != "in-progress")];
-  }
+    using (cancellationToken.Register(() =>
+    {
+        tcs.TrySetCanceled(cancellationToken);
+        _server.RemoveResponseListener(runId);
+    }))
+    {
+        try
+        {
+            await invokeRpcAsync();
+            return await tcs.Task;
+        }
+        catch
+        {
+            _server.RemoveResponseListener(runId);
+            throw;
+        }
+    }
+}
 
   public async ValueTask DisposeAsync()
   {
