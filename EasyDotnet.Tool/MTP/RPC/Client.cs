@@ -5,15 +5,14 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-
-using EasyDotnet.MTP;
-using EasyDotnet.Playground.RPC.Models;
+using EasyDotnet.MTP.RPC.Models;
+using EasyDotnet.MTP.RPC.Requests;
+using EasyDotnet.MTP.RPC.Response;
 using EasyDotnet.Playground.RPC.Requests;
-using EasyDotnet.Playground.RPC.Response;
 
 using StreamJsonRpc;
 
-namespace EasyDotnet.Playground.RPC;
+namespace EasyDotnet.MTP.RPC;
 
 public class Client : IAsyncDisposable
 {
@@ -114,7 +113,7 @@ public class Client : IAsyncDisposable
 
   public async ValueTask DisposeAsync()
   {
-    Console.WriteLine("Disposing...");
+    Console.WriteLine("Disposing..." );
     await _jsonRpc.NotifyWithParameterObjectAsync("exit", new object());
     _jsonRpc.Dispose();
     _tcpClient.Dispose();

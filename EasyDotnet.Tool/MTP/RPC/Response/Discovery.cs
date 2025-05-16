@@ -1,8 +1,8 @@
-using EasyDotnet.Playground.RPC.Models;
+using EasyDotnet.MTP.RPC.Models;
 
 using Newtonsoft.Json;
 
-namespace EasyDotnet.Playground.RPC.Response;
+namespace EasyDotnet.MTP.RPC.Response;
 
 public sealed record DiscoveryResponse(
     [property: JsonProperty("changes")]

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace EasyDotnet.Playground.RPC.Response;
+namespace EasyDotnet.MTP.RPC.Response;
 
 public sealed record ServerCapabilities(
     [property: JsonProperty("testing")]

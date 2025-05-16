@@ -1,10 +1,8 @@
 using System;
 
-using EasyDotnet.MTP;
-
 using Newtonsoft.Json;
 
-namespace EasyDotnet.Playground.RPC.Requests;
+namespace EasyDotnet.MTP.RPC.Requests;
 
 public sealed record RunRequest(
   [property:JsonProperty("tests")]

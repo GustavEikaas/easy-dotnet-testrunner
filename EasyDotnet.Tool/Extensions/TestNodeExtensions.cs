@@ -1,4 +1,4 @@
-using EasyDotnet.Playground.RPC.Models;
+using EasyDotnet.MTP.RPC.Models;
 using EasyDotnet.Types;
 
 namespace EasyDotnet.Extensions;

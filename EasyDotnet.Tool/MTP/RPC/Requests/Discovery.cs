@@ -2,7 +2,7 @@ using System;
 
 using Newtonsoft.Json;
 
-namespace EasyDotnet.Playground.RPC.Requests;
+namespace EasyDotnet.MTP.RPC.Requests;
 
 public sealed record DiscoveryRequest(
     [property:JsonProperty("runId")]

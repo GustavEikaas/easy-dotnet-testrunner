@@ -2,14 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using EasyDotnet.Playground.RPC.Models;
+using EasyDotnet.MTP.RPC.Models;
 
 using Newtonsoft.Json;
 
 using StreamJsonRpc;
 
-namespace EasyDotnet.Playground;
+namespace EasyDotnet.MTP;
 
 internal class Server
 {
