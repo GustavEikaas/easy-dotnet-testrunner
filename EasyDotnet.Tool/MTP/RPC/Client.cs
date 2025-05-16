@@ -147,7 +147,6 @@ private async Task<TestNodeUpdate[]> WithCancellation(
 
   public async ValueTask DisposeAsync()
   {
-    Console.WriteLine("Disposing..." );
     await _jsonRpc.NotifyWithParameterObjectAsync("exit", new object());
     _jsonRpc.Dispose();
     _tcpClient.Dispose();
