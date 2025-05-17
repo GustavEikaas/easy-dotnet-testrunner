@@ -56,9 +56,7 @@ public class Client : IAsyncDisposable
         {
           return;
         }
-
-
-        Console.Error.WriteLine($"[{testExePath}]: exit code '{exitCode}'");
+        // Console.Error.WriteLine($"[{testExePath}]: exit code '{exitCode}'");
       }
     };
 
