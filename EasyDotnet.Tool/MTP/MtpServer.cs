@@ -10,7 +10,7 @@ using StreamJsonRpc;
 
 namespace EasyDotnet.MTP;
 
-internal class Server
+internal class MtpServer
 {
   private readonly ConcurrentDictionary<Guid, TaskCompletionSource<TestNodeUpdate[]>> _listeners = new();
   private readonly ConcurrentDictionary<Guid, List<TestNodeUpdate>> _buffers = new();

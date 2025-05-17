@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using EasyDotnet.MTP.RPC.Models;
 using EasyDotnet.MTP.RPC.Requests;
 using EasyDotnet.MTP.RPC.Response;
-using EasyDotnet.Playground.RPC.Requests;
 
 using StreamJsonRpc;
 
@@ -19,9 +18,9 @@ public class Client : IAsyncDisposable
   private readonly JsonRpc _jsonRpc;
   private readonly TcpClient _tcpClient;
   private readonly IProcessHandle _processHandle;
-  private readonly Server _server;
+  private readonly MtpServer _server;
 
-  private Client(JsonRpc jsonRpc, TcpClient tcpClient, IProcessHandle processHandle, Server server)
+  private Client(JsonRpc jsonRpc, TcpClient tcpClient, IProcessHandle processHandle, MtpServer server)
   {
     _jsonRpc = jsonRpc;
     _tcpClient = tcpClient;
@@ -37,7 +36,7 @@ public class Client : IAsyncDisposable
     var port = ((IPEndPoint)tcpListener.LocalEndpoint).Port;
     Console.WriteLine($"Listening on port: {port}");
 
-    var server = new Server();
+    var server = new MtpServer();
 
     var processConfig = new ProcessConfiguration(testExePath)
     {

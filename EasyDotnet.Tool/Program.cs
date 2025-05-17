@@ -4,9 +4,10 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-using EasyDotnet;
+using EasyDotnet.Server;
 
 using StreamJsonRpc;
+
 class Program
 {
   private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");

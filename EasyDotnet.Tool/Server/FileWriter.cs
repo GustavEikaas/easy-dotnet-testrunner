@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 using EasyDotnet.Types;
 
-namespace EasyDotnet;
+namespace EasyDotnet.Server;
 
 public static class TestWriter
 {

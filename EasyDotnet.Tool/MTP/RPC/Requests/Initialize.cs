@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace EasyDotnet.Playground.RPC.Requests;
+namespace EasyDotnet.MTP.RPC.Requests;
 
 public sealed record InitializeRequest(
   [property:JsonProperty("processId")]

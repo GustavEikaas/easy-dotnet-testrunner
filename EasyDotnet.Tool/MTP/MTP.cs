@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using EasyDotnet.Extensions;
 using EasyDotnet.MTP.RPC;
+using EasyDotnet.Server;
 
 namespace EasyDotnet.MTP;
 

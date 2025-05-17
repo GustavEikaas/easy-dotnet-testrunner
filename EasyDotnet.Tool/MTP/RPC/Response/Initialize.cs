@@ -13,6 +13,7 @@ public sealed record ServerTestingCapabilities(
   bool MultiRequestSupport,
     [property: JsonProperty("vsTestProvider")]
   bool VSTestProvider);
+
 public sealed record ServerInfo(
     [property:JsonProperty("name")]
   string Name,

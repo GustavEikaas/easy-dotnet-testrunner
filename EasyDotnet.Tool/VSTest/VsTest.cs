@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 
+using EasyDotnet.Server;
+
 namespace EasyDotnet.VSTest;
 
 public static class VsTestHandler
