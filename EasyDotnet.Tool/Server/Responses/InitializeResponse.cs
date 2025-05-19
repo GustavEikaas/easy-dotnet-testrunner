@@ -2,12 +2,6 @@ using Newtonsoft.Json;
 
 namespace EasyDotnet.Server.Responses;
 
-public sealed record ServerInfo(
-[property:JsonProperty("name")]
-string Name,
+public sealed record ServerInfo(string Name, string Version);
 
-[property:JsonProperty("version")]
-string Version);
-
-public sealed record InitializeResponse(
-  ServerInfo ServerInfo);
+public sealed record InitializeResponse(ServerInfo ServerInfo);

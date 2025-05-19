@@ -9,12 +9,13 @@ using EasyDotnet.Server;
 
 using Microsoft.Build.Locator;
 
+using Newtonsoft.Json.Serialization;
+
 using StreamJsonRpc;
 
 class Program
 {
-  // private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
-  private static readonly string PipeName = "EasyDotnetPipe_";
+  private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {
@@ -48,11 +49,19 @@ class Program
 
   private static async Task RespondToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
   {
-    var jsonRpc = JsonRpc.Attach(stream, new Server());
+
+    var jsonMessageFormatter = new JsonMessageFormatter();
+    jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
+    {
+        NamingStrategy = new CamelCaseNamingStrategy()
+    };
+
+    var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
+    var jsonRpc = new JsonRpc(handler, new Server());
     // if(true == true){
-      var ts = jsonRpc.TraceSource;
-      ts.Switch.Level = SourceLevels.Verbose;
-      ts.Listeners.Add(new ConsoleTraceListener());
+    //   var ts = rpc.TraceSource;
+    //   ts.Switch.Level = SourceLevels.Verbose;
+    //   ts.Listeners.Add(new ConsoleTraceListener());
     // }
     jsonRpc.StartListening();
     await Console.Error.WriteLineAsync($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");

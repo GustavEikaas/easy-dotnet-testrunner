@@ -19,7 +19,7 @@ public static class VsTestHandler
             test => test.Key.Replace("\\","/"),
             (proj, test) => new { proj.outFile, Tests = test.Value}
         )
-        .ToList().ForEach(x => TestWriter.WriteDiscoveredTests(x.Tests, x.outFile));
+        .ToList().ForEach(x => OutFileWriter.WriteDiscoveredTests(x.Tests, x.outFile));
   }
 
   public static void RunTests(
@@ -30,7 +30,7 @@ public static class VsTestHandler
 )
   {
     var testResults = RunHandler.RunTests(vsTestPath, dllPath, testIds);
-    TestWriter.WriteTestRunResults(testResults, outFile);
+    OutFileWriter.WriteTestRunResults(testResults, outFile);
   }
 
 }

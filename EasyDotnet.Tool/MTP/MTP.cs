@@ -21,7 +21,7 @@ public static class MTPHandler
     await using var client = await Client.CreateAsync(testExecutablePath);
     var discovered = await client.DiscoverTestsAsync(token);
     var tests = discovered.Where(x => x != null && x.Node != null).Select(x => x.ToDiscoveredTest()).ToList();
-    TestWriter.WriteDiscoveredTests(tests, outFile);
+    OutFileWriter.WriteDiscoveredTests(tests, outFile);
   }
 
   public static async Task RunTestsAsync(string testExecutablePath, RunRequestNode[] filter, string outFile, CancellationToken token)
@@ -34,6 +34,6 @@ public static class MTPHandler
     await using var client = await Client.CreateAsync(testExecutablePath);
     var runResults = await client.RunTestsAsync(filter, token);
     var results = runResults.Select(x => x.ToTestRunResult()).ToList();
-    TestWriter.WriteTestRunResults(results, outFile);
+    OutFileWriter.WriteTestRunResults(results, outFile);
   }
 }

@@ -8,7 +8,7 @@ using EasyDotnet.Types;
 
 namespace EasyDotnet.Server;
 
-public static class TestWriter
+public static class OutFileWriter
 {
   private static readonly JsonSerializerOptions SerializerOptions = new()
   {
@@ -45,6 +45,22 @@ public static class TestWriter
     else
     {
       testList.ToList().ForEach(x =>
+          writer.WriteLine(JsonSerializer.Serialize(x, SerializerOptions).Replace("\n", "").Replace("\r", ""))
+        );
+    }
+  }
+
+  public static void WriteBuildResult(List<BuildMessage> messages, string outFile)
+  {
+    using var writer = new StreamWriter(outFile, false);
+
+    if (messages.Count == 0)
+    {
+      writer.WriteLine("[]");
+    }
+    else
+    {
+      messages.ToList().ForEach(x =>
           writer.WriteLine(JsonSerializer.Serialize(x, SerializerOptions).Replace("\n", "").Replace("\r", ""))
         );
     }

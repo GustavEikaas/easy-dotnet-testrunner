@@ -18,14 +18,12 @@ using StreamJsonRpc;
 
 namespace EasyDotnet.Server;
 
-#pragma warning disable IDE1006 // Naming Styles
-//TODO: figure out how to automatically serialize output
-public sealed record FileResult(string outFile);
-public sealed record BuildResult(bool success);
+public sealed record FileResult(string OutFile);
+public sealed record BuildResult(bool Success);
 
 internal class Server
 {
-  private bool isInitialized { get; set; }
+  private bool IsInitialized { get; set; }
 
   [JsonRpcMethod("initialize")]
   public InitializeResponse Initialize(InitializeRequest request)
@@ -49,7 +47,7 @@ internal class Server
       }
     }
     Directory.SetCurrentDirectory(request.ProjectInfo.RootDir);
-    isInitialized = true;
+    IsInitialized = true;
     return new InitializeResponse(new ServerInfo("EasyDotnet", serverVersion.ToString()));
   }
 
@@ -58,7 +56,7 @@ internal class Server
   {
     var properties = new Dictionary<string, string?>
     {
-        { "Configuration", request.Configuration}
+        { "Configuration", request.ConfigurationOrDefault}
     };
 
     var pc = new ProjectCollection(properties);
@@ -71,14 +69,21 @@ internal class Server
     };
 
     var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
+    
+    var buildResult = new BuildResult(result.OverallResult == BuildResultCode.Success);
 
-    return new BuildResult(result.OverallResult == BuildResultCode.Success);
+    if(request.OutFile is not null)
+    {
+      OutFileWriter.WriteBuildResult(logger.Messages, request.OutFile);
+    }
+
+    return buildResult;
   }
 
   [JsonRpcMethod("mtp/discover")]
   public async Task<FileResult> MtpDiscover(string testExecutablePath, CancellationToken token)
   {
-    if(!isInitialized){
+    if(!IsInitialized){
       throw new Exception("Client has not initialized yet");
     }
     var outFile = Path.GetTempFileName();
@@ -90,7 +95,7 @@ internal class Server
   [JsonRpcMethod("mtp/run")]
   public async Task<FileResult> MtpRun(string testExecutablePath, RunRequestNode[] filter, CancellationToken token)
   {
-    if(!isInitialized){
+    if(!IsInitialized){
       throw new Exception("Client has not initialized yet");
     }
     var outFile = Path.GetTempFileName();
@@ -102,7 +107,7 @@ internal class Server
   [JsonRpcMethod("vstest/discover")]
   public FileResult VsTestDiscover(string vsTestPath, string dllPath)
   {
-    if(!isInitialized){
+    if(!IsInitialized){
       throw new Exception("Client has not initialized yet");
     }
     var outFile = Path.GetTempFileName();
@@ -114,7 +119,7 @@ internal class Server
   [JsonRpcMethod("vstest/run")]
   public FileResult VsTestRun(string vsTestPath, string dllPath, Guid[] testIds)
   {
-    if(!isInitialized){
+    if(!IsInitialized){
       throw new Exception("Client has not initialized yet");
     }
     var outFile = Path.GetTempFileName();
@@ -150,24 +155,33 @@ internal class Server
 
 }
 
-public sealed record BuildError(string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
+public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
 
 public class InMemoryLogger : ILogger
 {
-    public List<BuildError> Errors { get; } = [];
+    public List<BuildMessage> Messages { get; } = [];
 
     public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
     public string? Parameters { get; set; }
 
     public void Initialize(IEventSource eventSource)
     {
-        eventSource.ErrorRaised += (sender, args) => Errors.Add(new BuildError(
+        eventSource.ErrorRaised += (sender, args) => Messages.Add(new BuildMessage(
+                "error",
                 args.File,
                 args.LineNumber,
                 args.ColumnNumber,
                 args.Code,
                 args?.Message
             ));
+        eventSource.WarningRaised += (sender, args) => Messages.Add(new BuildMessage(
+                "warning",
+                args.File,
+                args.LineNumber,
+                args.ColumnNumber,
+                args.Code,
+                args?.Message
+        ));
     }
 
     public void Shutdown() { }
