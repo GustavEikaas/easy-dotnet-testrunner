@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
@@ -6,11 +7,14 @@ using System.Threading.Tasks;
 
 using EasyDotnet.Server;
 
+using Microsoft.Build.Locator;
+
 using StreamJsonRpc;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
+  // private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
+  private static readonly string PipeName = "EasyDotnetPipe_";
 
   public static async Task<int> Main(string[] args)
   {
@@ -19,6 +23,10 @@ class Program
       var version = assembly.GetName().Version;
       Console.WriteLine($"Assembly Version: {version}");
       return 0;
+    }
+    if (!MSBuildLocator.IsRegistered)
+    {
+        MSBuildLocator.RegisterDefaults();
     }
 
     await StartServerAsync();
@@ -42,9 +50,9 @@ class Program
   {
     var jsonRpc = JsonRpc.Attach(stream, new Server());
     // if(true == true){
-    //   var ts = jsonRpc.TraceSource;
-    //   ts.Switch.Level = SourceLevels.Verbose;
-    //   ts.Listeners.Add(new ConsoleTraceListener());
+      var ts = jsonRpc.TraceSource;
+      ts.Switch.Level = SourceLevels.Verbose;
+      ts.Listeners.Add(new ConsoleTraceListener());
     // }
     jsonRpc.StartListening();
     await Console.Error.WriteLineAsync($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
