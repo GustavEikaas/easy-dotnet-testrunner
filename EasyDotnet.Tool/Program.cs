@@ -15,11 +15,12 @@ using StreamJsonRpc;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnetPipe_" + Guid.NewGuid().ToString("N");
+  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {
-    if(args.Contains("-v")){
+    if (args.Contains("-v"))
+    {
       var assembly = Assembly.GetExecutingAssembly();
       var version = assembly.GetName().Version;
       Console.WriteLine($"Assembly Version: {version}");
@@ -27,7 +28,7 @@ class Program
     }
     if (!MSBuildLocator.IsRegistered)
     {
-        MSBuildLocator.RegisterDefaults();
+      MSBuildLocator.RegisterDefaults();
     }
 
     await StartServerAsync();
@@ -53,7 +54,7 @@ class Program
     var jsonMessageFormatter = new JsonMessageFormatter();
     jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
     {
-        NamingStrategy = new CamelCaseNamingStrategy()
+      NamingStrategy = new CamelCaseNamingStrategy()
     };
 
     var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
