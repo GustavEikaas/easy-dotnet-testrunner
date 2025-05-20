@@ -59,12 +59,12 @@ class Program
     var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
     var jsonRpc = new JsonRpc(handler, new Server());
     // if(true == true){
-    //   var ts = rpc.TraceSource;
+    //   var ts = jsonRpc.TraceSource;
     //   ts.Switch.Level = SourceLevels.Verbose;
     //   ts.Listeners.Add(new ConsoleTraceListener());
     // }
     jsonRpc.StartListening();
-    await Console.Error.WriteLineAsync($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
+    Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
     await jsonRpc.Completion;
     await Console.Error.WriteLineAsync($"Connection #{clientId} terminated.");
   }
