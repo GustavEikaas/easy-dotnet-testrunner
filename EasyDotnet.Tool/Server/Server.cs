@@ -54,6 +54,10 @@ internal class Server
   [JsonRpcMethod("msbuild/build")]
   public BuildResult Build(BuildRequest request)
   {
+    if(!IsInitialized) {
+      throw new Exception("Client has not initialized yet");
+    }
+
     var properties = new Dictionary<string, string?>
     {
         { "Configuration", request.ConfigurationOrDefault}
