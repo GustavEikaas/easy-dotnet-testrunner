@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
@@ -13,8 +12,7 @@ using StreamJsonRpc;
 
 class Program
 {
-  // private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
-  private static readonly string PipeName = "EasyDotnet_c98f2bd5924d4180ba75bc3f790c382e";
+  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {
