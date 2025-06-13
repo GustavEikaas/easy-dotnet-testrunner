@@ -8,7 +8,7 @@ namespace EasyDotnet.Controllers.Nuget;
 public class NugetController(ClientService clientService, NugetService nugetService) : BaseController
 {
   [JsonRpcMethod("nuget/list-sources")]
-  public List<NugetSourceResponse> GetSources()
+  public List<NugetSourceResponse> GetSources(string name)
   {
     clientService.ThrowIfNotInitialized();
 
