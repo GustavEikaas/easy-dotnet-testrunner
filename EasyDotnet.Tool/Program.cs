@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
@@ -31,14 +32,14 @@ class Program
     if (args.Contains("--generate-rpc-docs"))
     {
       var doc = RpcDocGenerator.GenerateJsonDoc();
-      Console.WriteLine(doc);
+      File.WriteAllText("./rpcDoc.json", doc);
       return 0;
     }
 
     if (args.Contains("--generate-rpc-docs-md"))
     {
       var md = RpcDocGenerator.GenerateMarkdownDoc();
-      Console.WriteLine(md);
+      File.WriteAllText("./rpcDoc.md", md);
       return 0;
     }
 
