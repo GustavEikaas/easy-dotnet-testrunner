@@ -29,14 +29,10 @@ public class NugetService
   {
     var provider = Repository.Provider.GetCoreV3();
 
-    var settings = Settings.LoadDefaultSettings(null);
-    var sourceProvider = new PackageSourceProvider(settings);
+    var sourceProvider = new PackageSourceProvider(Settings.LoadDefaultSettings(null));
     var allSources = sourceProvider.LoadPackageSources().Where(s => s.IsEnabled);
 
-    // If specific source names were provided, filter by those
-    var selectedSources = sourceNames == null
-        ? allSources
-        : allSources.Where(s => sourceNames.Contains(s.Name, StringComparer.OrdinalIgnoreCase));
+    var selectedSources = sourceNames == null ? allSources : allSources.Where(s => sourceNames.Contains(s.Name, StringComparer.OrdinalIgnoreCase));
 
     var taskMap = selectedSources.ToDictionary(
         source => source.Name,
