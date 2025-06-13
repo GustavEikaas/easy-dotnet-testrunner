@@ -7,7 +7,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.12</Version>
+    <Version>0.0.13</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
