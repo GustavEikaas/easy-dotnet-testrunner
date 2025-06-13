@@ -3,12 +3,11 @@ using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
 
-namespace EasyDotnet.Msbuild;
+namespace EasyDotnet.Services;
 
-public record BuildResult(Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
-
-public class Msbuild
+public class MsBuildService
 {
+
   public BuildResult RequestBuild(string targetPath, string configuration)
   {
     var properties = new Dictionary<string, string?> { { "Configuration", configuration } };
@@ -24,6 +23,9 @@ public class Msbuild
     return new BuildResult(result, logger.Messages);
   }
 }
+
+public record BuildResult(Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
+
 
 public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
 

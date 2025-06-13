@@ -1,4 +1,4 @@
-namespace EasyDotnet.Server.Requests;
+namespace EasyDotnet.Controllers.MsBuild;
 
 public sealed record BuildRequest(
   string TargetPath,

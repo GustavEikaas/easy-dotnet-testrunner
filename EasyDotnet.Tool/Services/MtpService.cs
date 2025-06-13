@@ -2,16 +2,15 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using EasyDotnet.Extensions;
+using EasyDotnet.MTP;
 using EasyDotnet.MTP.RPC;
-using EasyDotnet.Server;
 
-namespace EasyDotnet.MTP;
+namespace EasyDotnet.Services;
 
-public static class MTPHandler
+public class MtpService(OutFileWriterService outFileWriterService)
 {
-  public static async Task RunDiscoverAsync(string testExecutablePath, string outFile, CancellationToken token)
+  public async Task RunDiscoverAsync(string testExecutablePath, string outFile, CancellationToken token)
   {
     if (!File.Exists(testExecutablePath))
     {
@@ -21,10 +20,10 @@ public static class MTPHandler
     await using var client = await Client.CreateAsync(testExecutablePath);
     var discovered = await client.DiscoverTestsAsync(token);
     var tests = discovered.Where(x => x != null && x.Node != null).Select(x => x.ToDiscoveredTest()).ToList();
-    OutFileWriter.WriteDiscoveredTests(tests, outFile);
+    outFileWriterService.WriteDiscoveredTests(tests, outFile);
   }
 
-  public static async Task RunTestsAsync(string testExecutablePath, RunRequestNode[] filter, string outFile, CancellationToken token)
+  public async Task RunTestsAsync(string testExecutablePath, RunRequestNode[] filter, string outFile, CancellationToken token)
   {
 
     if (!File.Exists(testExecutablePath))
@@ -34,6 +33,6 @@ public static class MTPHandler
     await using var client = await Client.CreateAsync(testExecutablePath);
     var runResults = await client.RunTestsAsync(filter, token);
     var results = runResults.Select(x => x.ToTestRunResult()).ToList();
-    OutFileWriter.WriteTestRunResults(results, outFile);
+    outFileWriterService.WriteTestRunResults(results, outFile);
   }
 }

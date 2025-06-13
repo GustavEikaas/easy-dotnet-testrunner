@@ -5,8 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using EasyDotnet;
-using EasyDotnet.Server;
-
+using EasyDotnet.Utils;
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -57,11 +56,23 @@ class Program
     {
       NamingStrategy = new CamelCaseNamingStrategy(),
     };
-    var provider = DiModules.BuildServiceProvider();
-    var rpcHandler = provider.GetRequiredService<Server>();
 
     var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
-    var jsonRpc = new JsonRpc(handler, rpcHandler);
+    var jsonRpc = new JsonRpc(handler);
+    var provider = DiModules.BuildServiceProvider(jsonRpc);
+
+    AssemblyScanner.GetControllerTypes().ForEach(x =>
+    {
+      try
+      {
+        var target = provider.GetRequiredService(x);
+        jsonRpc.AddLocalRpcTarget(target);
+      }
+      catch (Exception ex)
+      {
+        Console.Error.WriteLine($"Failed to add RPC target for {x.FullName}: {ex.Message}");
+      }
+    });
     // if (true == true)
     // {
     //   var ts = jsonRpc.TraceSource;

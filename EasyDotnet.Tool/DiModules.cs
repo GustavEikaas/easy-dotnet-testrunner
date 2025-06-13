@@ -1,14 +1,23 @@
+using EasyDotnet.Services;
+using EasyDotnet.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using StreamJsonRpc;
 
 namespace EasyDotnet;
 
 public static class DiModules
 {
-  public static ServiceProvider BuildServiceProvider()
+  //Singleton is scoped per client
+  public static ServiceProvider BuildServiceProvider(JsonRpc jsonRpc)
   {
     var services = new ServiceCollection();
-    services.AddTransient<Server.Server>();
-    services.AddTransient<Msbuild.Msbuild>();
+    services.AddTransient<MsBuildService>();
+    services.AddSingleton<ClientService>();
+    services.AddSingleton<OutFileWriterService>();
+    services.AddSingleton<VsTestService>();
+    services.AddSingleton<MtpService>();
+    services.AddSingleton(jsonRpc);
+    AssemblyScanner.GetControllerTypes().ForEach(x => services.AddSingleton(x));
     var provider = services.BuildServiceProvider();
     return provider;
   }

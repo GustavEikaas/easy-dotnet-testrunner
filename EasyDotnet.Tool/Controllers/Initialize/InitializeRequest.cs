@@ -1,6 +1,5 @@
-using Newtonsoft.Json;
 
-namespace EasyDotnet.Server.Requests;
+namespace EasyDotnet.Controllers.Initialize;
 
 public sealed record InitializeRequest(ClientInfo ClientInfo, ProjectInfo ProjectInfo);
 

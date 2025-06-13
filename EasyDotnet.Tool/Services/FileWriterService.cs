@@ -3,13 +3,11 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
-using EasyDotnet.Msbuild;
 using EasyDotnet.Types;
 
-namespace EasyDotnet.Server;
+namespace EasyDotnet.Services;
 
-public static class OutFileWriter
+public class OutFileWriterService
 {
   private static readonly JsonSerializerOptions SerializerOptions = new()
   {
@@ -18,7 +16,7 @@ public static class OutFileWriter
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
   };
 
-  public static void WriteTestRunResults(List<TestRunResult> results, string outFile)
+  public void WriteTestRunResults(List<TestRunResult> results, string outFile)
   {
 
     using var writer = new StreamWriter(outFile, false);
@@ -35,7 +33,7 @@ public static class OutFileWriter
     }
   }
 
-  public static void WriteDiscoveredTests(List<DiscoveredTest> testList, string outFile)
+  public void WriteDiscoveredTests(List<DiscoveredTest> testList, string outFile)
   {
     using var writer = new StreamWriter(outFile, false);
 
@@ -51,7 +49,7 @@ public static class OutFileWriter
     }
   }
 
-  public static void WriteBuildResult(List<BuildMessage> messages, string outFile)
+  public void WriteBuildResult(List<BuildMessage> messages, string outFile)
   {
     using var writer = new StreamWriter(outFile, false);
 

@@ -4,9 +4,9 @@ using System.Reflection;
 using EasyDotnet.Services;
 using StreamJsonRpc;
 
-namespace EasyDotnet.Controllers;
+namespace EasyDotnet.Controllers.Initialize;
 
-public class InitializeController
+public class InitializeController(ClientService clientService): BaseController
 {
   [JsonRpcMethod("initialize")]
   public InitializeResponse Initialize(InitializeRequest request)
@@ -31,17 +31,7 @@ public class InitializeController
       }
     }
     Directory.SetCurrentDirectory(request.ProjectInfo.RootDir);
-    new ClientService().IsInitialized = true;
+    clientService.IsInitialized = true;
     return new InitializeResponse(new ServerInfo("EasyDotnet", serverVersion.ToString()));
   }
 }
-
-public sealed record ServerInfo(string Name, string Version);
-
-public sealed record InitializeResponse(ServerInfo ServerInfo);
-
-public sealed record InitializeRequest(ClientInfo ClientInfo, ProjectInfo ProjectInfo);
-
-public sealed record ProjectInfo(string RootDir);
-
-public sealed record ClientInfo(string Name, string? Version);

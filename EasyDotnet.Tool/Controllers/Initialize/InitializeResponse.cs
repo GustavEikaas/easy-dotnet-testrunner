@@ -1,6 +1,4 @@
-using Newtonsoft.Json;
-
-namespace EasyDotnet.Server.Responses;
+namespace EasyDotnet.Controllers.Initialize;
 
 public sealed record ServerInfo(string Name, string Version);
 
