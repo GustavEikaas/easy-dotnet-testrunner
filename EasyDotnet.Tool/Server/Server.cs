@@ -17,7 +17,7 @@ public sealed record FileResult(string OutFile);
 
 public sealed record BuildResult(bool Success);
 
-internal class Server(Msbuild.Msbuild msbuild)
+internal class Server(MsBuild.MsBuild msbuild)
 {
   private bool IsInitialized { get; set; }
 

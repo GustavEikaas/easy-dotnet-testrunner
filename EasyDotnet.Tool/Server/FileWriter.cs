@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-using EasyDotnet.Msbuild;
+using EasyDotnet.MsBuild;
 using EasyDotnet.Types;
 
 namespace EasyDotnet.Server;

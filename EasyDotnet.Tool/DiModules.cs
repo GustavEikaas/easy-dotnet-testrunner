@@ -8,7 +8,7 @@ public static class DiModules
   {
     var services = new ServiceCollection();
     services.AddTransient<Server.Server>();
-    services.AddTransient<Msbuild.Msbuild>();
+    services.AddTransient<MsBuild.MsBuild>();
     var provider = services.BuildServiceProvider();
     return provider;
   }
