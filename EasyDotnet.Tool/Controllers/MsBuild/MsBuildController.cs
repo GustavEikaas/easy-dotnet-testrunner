@@ -34,6 +34,6 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
       throw new Exception("Client has not initialized yet");
     }
 
-    return msBuild.QueryProject(request.TargetPath, request.ConfigurationOrDefault).ToResponse();
+    return msBuild.QueryProject(request.TargetPath, request.ConfigurationOrDefault, request.TargetFramework).ToResponse();
   }
 }

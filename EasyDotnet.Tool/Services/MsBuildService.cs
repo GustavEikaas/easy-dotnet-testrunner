@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
@@ -24,9 +25,13 @@ public class MsBuildService
     return new BuildResult(result, logger.Messages);
   }
 
-  public DotnetProjectProperties QueryProject(string targetPath, string configuration)
+  public DotnetProjectProperties QueryProject(string targetPath, string configuration, string? targetFramework)
   {
-    var properties = new Dictionary<string, string?> { { "Configuration", configuration } };
+    var properties = new Dictionary<string, string> { { "Configuration", configuration } };
+    if (!string.IsNullOrEmpty(targetFramework))
+    {
+      properties.Add("TargetFramework", targetFramework);
+    }
     var pc = new ProjectCollection(properties);
 
     var project = pc.LoadProject(targetPath);
