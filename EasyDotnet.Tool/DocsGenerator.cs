@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
+using System.Threading;
 using EasyDotnet.Utils;
 using StreamJsonRpc;
 
@@ -11,9 +13,8 @@ namespace EasyDotnet;
 
 public static class RpcDocGenerator
 {
-  public static string GenerateJsonDoc()
-  {
-    var allDocs = AssemblyScanner.GetControllerTypes()
+
+  private static List<RpcApiDoc> GenerateDocStructure() => [.. AssemblyScanner.GetControllerTypes()
         .Select(rpcType =>
         {
           var methods = rpcType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
@@ -44,10 +45,44 @@ public static class RpcDocGenerator
             Methods = methods
           };
         })
-        .Where(doc => doc.Methods.Count > 0)
-        .ToList();
+        .Where(doc => doc.Methods.Count > 0)];
 
-    return JsonSerializer.Serialize(allDocs, new JsonSerializerOptions { WriteIndented = true });
+  public static string GenerateJsonDoc() => JsonSerializer.Serialize(GenerateDocStructure(), new JsonSerializerOptions { WriteIndented = true });
+
+  public static string GenerateMarkdownDoc()
+  {
+    var docs = GenerateDocStructure();
+
+    var sb = new StringBuilder();
+
+    foreach (var controller in docs!)
+    {
+      sb.AppendLine($"## {controller.ClassName}\n");
+
+      foreach (var method in controller.Methods)
+      {
+        sb.AppendLine($"### `{method.RpcPath}`");
+        if (method.Parameters.Count != 0)
+        {
+          sb.AppendLine("| Parameter | Type | Optional |");
+          sb.AppendLine("|-----------|------|----------|");
+
+          method.Parameters.Where(x => x.Type != "CancellationToken").ToList().ForEach(x => sb.AppendLine($"| {x.Name} | {x.Type} | {(x.IsOptional ? "✅" : "")}  |"));
+
+          sb.AppendLine();
+        }
+        else
+        {
+          sb.AppendLine("_No parameters_\n");
+        }
+
+        sb.AppendLine($"**Returns:** `{method.ReturnType}`\n");
+      }
+
+      sb.AppendLine("---\n");
+    }
+
+    return sb.ToString();
   }
 
 
