@@ -24,6 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" Version="15.1.548" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
     <PackageReference Include="Microsoft.TestPlatform.TranslationLayer" Version="17.13.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.3.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.3.1" />
