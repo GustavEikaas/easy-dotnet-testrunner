@@ -22,9 +22,6 @@ insert_final_newline = false
 
 #### .NET Coding Conventions ####
 [*.{cs,vb}]
-dotnet_style_prefer_var_for_built_in_types = true:error
-dotnet_style_prefer_var_when_type_is_apparent = true:error
-dotnet_style_prefer_var_when_type_is_not_apparent = true:error
 
 # Organize usings
 dotnet_separate_import_directive_groups = false
@@ -81,11 +78,12 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 
 #### C# Coding Conventions ####
 [*.cs]
+max_line_length = 240
 
 # var preferences
-csharp_style_var_elsewhere = false:silent
-csharp_style_var_for_built_in_types = false:silent
-csharp_style_var_when_type_is_apparent = false:silent
+csharp_style_var_elsewhere = true:error
+csharp_style_var_for_built_in_types = true:error
+csharp_style_var_when_type_is_apparent = true:error
 
 # Expression-bodied members
 csharp_style_expression_bodied_accessors = true:error
