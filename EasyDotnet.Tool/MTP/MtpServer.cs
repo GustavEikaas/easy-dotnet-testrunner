@@ -10,18 +10,15 @@ namespace EasyDotnet.MTP;
 
 internal class MtpServer
 {
-  private readonly ConcurrentDictionary<Guid, TaskCompletionSource<TestNodeUpdate[]>> _listeners =
-    new();
+  private readonly ConcurrentDictionary<Guid, TaskCompletionSource<TestNodeUpdate[]>> _listeners = new();
   private readonly ConcurrentDictionary<Guid, List<TestNodeUpdate>> _buffers = new();
 
-  public void RegisterResponseListener(Guid runId, TaskCompletionSource<TestNodeUpdate[]> task) =>
-    _ = _listeners.TryAdd(runId, task);
+  public void RegisterResponseListener(Guid runId, TaskCompletionSource<TestNodeUpdate[]> task) => _ = _listeners.TryAdd(runId, task);
 
   public void RemoveResponseListener(Guid runId) => _ = _listeners.TryRemove(runId, out _);
 
   [JsonRpcMethod("client/attachDebugger", UseSingleObjectParameterDeserialization = true)]
-  public static Task AttachDebuggerAsync(AttachDebuggerInfo attachDebuggerInfo) =>
-    throw new NotImplementedException();
+  public static Task AttachDebuggerAsync(AttachDebuggerInfo attachDebuggerInfo) => throw new NotImplementedException();
 
   [JsonRpcMethod("testing/testUpdates/tests")]
   public Task TestsUpdateAsync(Guid runId, TestNodeUpdate[]? changes)
@@ -63,10 +60,7 @@ internal class MtpServer
 
 public sealed record AttachDebuggerInfo([property: JsonProperty("processId")] int ProcessId);
 
-public record TelemetryPayload(
-  [property: JsonProperty(nameof(TelemetryPayload.EventName))] string EventName,
-  [property: JsonProperty("metrics")] IDictionary<string, string> Metrics
-);
+public record TelemetryPayload([property: JsonProperty(nameof(TelemetryPayload.EventName))] string EventName, [property: JsonProperty("metrics")] IDictionary<string, string> Metrics);
 
 public enum LogLevel
 {
