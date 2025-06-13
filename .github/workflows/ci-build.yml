@@ -30,8 +30,11 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add rpcDoc.md
-          if ! git diff --cached --quiet; then
+          git status
+          git diff HEAD -- rpcDoc.md || true
+          if ! git diff --quiet HEAD -- rpcDoc.md; then
             echo "rpcDoc.md is outdated. Please regenerate and commit changes."
-            git --no-pager diff
+            git --no-pager diff HEAD -- rpcDoc.md
             exit 1
           fi
+
