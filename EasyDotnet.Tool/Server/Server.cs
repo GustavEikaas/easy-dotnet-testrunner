@@ -3,11 +3,14 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EasyDotnet.MTP;
 using EasyDotnet.Server.Requests;
 using EasyDotnet.Server.Responses;
 using EasyDotnet.VSTest;
+
 using Microsoft.Build.Execution;
+
 using StreamJsonRpc;
 
 namespace EasyDotnet.Server;
@@ -138,9 +141,7 @@ internal class Server(Msbuild.Msbuild msbuild)
     Func<CancellationToken, Task> func,
     TimeSpan timeout,
     CancellationToken callerToken
-  )
-  {
-    return WithTimeout<object>(
+  ) => WithTimeout<object>(
       async ct =>
       {
         await func(ct);
@@ -149,7 +150,6 @@ internal class Server(Msbuild.Msbuild msbuild)
       timeout,
       callerToken
     );
-  }
 
   private static async Task<T> WithTimeout<T>(
     Func<CancellationToken, Task<T>> func,

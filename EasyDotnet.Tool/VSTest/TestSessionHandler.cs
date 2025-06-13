@@ -9,9 +9,6 @@ internal class TestSessionHandler : ITestSessionEventsHandler
 
   public void HandleLogMessage(TestMessageLevel level, string message) { }
   public void HandleRawMessage(string rawMessage) { }
-  public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs)
-  {
-    TestSessionInfo = eventArgs?.TestSessionInfo;
-  }
+  public void HandleStartTestSessionComplete(StartTestSessionCompleteEventArgs eventArgs) => TestSessionInfo = eventArgs?.TestSessionInfo;
   public void HandleStopTestSessionComplete(StopTestSessionCompleteEventArgs eventArgs) { }
 }

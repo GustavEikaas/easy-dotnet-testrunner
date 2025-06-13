@@ -29,25 +29,25 @@ public static class DiscoverHandler
   }
 }
 
-  public class PlaygroundTestDiscoveryHandler() : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
+public class PlaygroundTestDiscoveryHandler() : ITestDiscoveryEventsHandler, ITestDiscoveryEventsHandler2
+{
+  public List<TestCase> TestCases { get; internal set; } = [];
+
+  public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
   {
-    public List<TestCase> TestCases { get; internal set; } = [];
+    if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
+  }
 
-    public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
-    {
-      if (discoveredTestCases != null) { TestCases.AddRange(discoveredTestCases); }
-    }
+  public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
+  {
+    if (lastChunk != null) { TestCases.AddRange(lastChunk); }
+  }
 
-    public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
-    {
-      if (lastChunk != null) { TestCases.AddRange(lastChunk); }
-    }
+  public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
+  {
+    if (lastChunk != null) { TestCases.AddRange(lastChunk); }
+  }
 
-    public void HandleDiscoveryComplete(DiscoveryCompleteEventArgs discoveryCompleteEventArgs, IEnumerable<TestCase> lastChunk)
-    {
-      if (lastChunk != null) { TestCases.AddRange(lastChunk); }
-    }
-
-    public void HandleLogMessage(TestMessageLevel level, string message) { }
-    public void HandleRawMessage(string rawMessage) { }
+  public void HandleLogMessage(TestMessageLevel level, string message) { }
+  public void HandleRawMessage(string rawMessage) { }
 }

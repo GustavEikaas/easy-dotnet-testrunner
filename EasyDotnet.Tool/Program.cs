@@ -3,11 +3,15 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using EasyDotnet;
 using EasyDotnet.Server;
+
 using Microsoft.Build.Locator;
 using Microsoft.Extensions.DependencyInjection;
+
 using Newtonsoft.Json.Serialization;
+
 using StreamJsonRpc;
 
 class Program

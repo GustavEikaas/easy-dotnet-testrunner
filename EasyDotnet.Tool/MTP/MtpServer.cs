@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using EasyDotnet.MTP.RPC.Models;
 
 using Newtonsoft.Json;
@@ -53,18 +54,14 @@ internal class MtpServer
   }
 
   [JsonRpcMethod("telemetry/update", UseSingleObjectParameterDeserialization = true)]
-  public Task TelemetryAsync(TelemetryPayload telemetry)
-  {
+  public Task TelemetryAsync(TelemetryPayload telemetry) =>
     // Console.WriteLine("telemetry/update");
-    return Task.CompletedTask;
-  }
+    Task.CompletedTask;
 
   [JsonRpcMethod("client/log")]
-  public Task LogAsync(LogLevel level, string message)
-  {
+  public Task LogAsync(LogLevel level, string message) =>
     // Console.WriteLine("client/log");
-    return Task.CompletedTask;
-  }
+    Task.CompletedTask;
 
 }
 
