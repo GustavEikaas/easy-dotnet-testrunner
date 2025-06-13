@@ -26,6 +26,14 @@ _No parameters_
 
 **Returns:** `List<NugetSourceResponse>`
 
+### `nuget/search-packages`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| searchTerm | string |   |
+| sources | List<string> | ✅  |
+
+**Returns:** `Task<FileResultResponse>`
+
 ---
 
 ## MtpController
