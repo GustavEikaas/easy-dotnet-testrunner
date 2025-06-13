@@ -1,15 +1,11 @@
 using System.Collections.Generic;
-
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
 
 namespace EasyDotnet.Msbuild;
 
-public record BuildResult(
-  Microsoft.Build.Execution.BuildResult Result,
-  List<BuildMessage> Messages
-);
+public record BuildResult(Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
 
 public class Msbuild
 {
@@ -18,7 +14,7 @@ public class Msbuild
     var properties = new Dictionary<string, string?> { { "Configuration", configuration } };
 
     var pc = new ProjectCollection(properties);
-    var buildRequest = new BuildRequestData(targetPath, properties, null, ["Build"], null);
+    var buildRequest = new BuildRequestData(targetPath, properties, null, ["Restore", "Build"], null);
     var logger = new InMemoryLogger();
 
     var parameters = new BuildParameters(pc) { Loggers = [logger] };
@@ -29,14 +25,7 @@ public class Msbuild
   }
 }
 
-public sealed record BuildMessage(
-  string Type,
-  string FilePath,
-  int LineNumber,
-  int ColumnNumber,
-  string Code,
-  string? Message
-);
+public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
 
 public class InMemoryLogger : ILogger
 {
@@ -47,28 +36,8 @@ public class InMemoryLogger : ILogger
 
   public void Initialize(IEventSource eventSource)
   {
-    eventSource.ErrorRaised += (sender, args) =>
-      Messages.Add(
-        new BuildMessage(
-          "error",
-          args.File,
-          args.LineNumber,
-          args.ColumnNumber,
-          args.Code,
-          args?.Message
-        )
-      );
-    eventSource.WarningRaised += (sender, args) =>
-      Messages.Add(
-        new BuildMessage(
-          "warning",
-          args.File,
-          args.LineNumber,
-          args.ColumnNumber,
-          args.Code,
-          args?.Message
-        )
-      );
+    eventSource.ErrorRaised += (sender, args) => Messages.Add(new BuildMessage("error", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
+    eventSource.WarningRaised += (sender, args) => Messages.Add(new BuildMessage("warning", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
   }
 
   public void Shutdown() { }
