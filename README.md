@@ -19,7 +19,7 @@ This server is an internal component of the `easy-dotnet.nvim` plugin and is **n
 
 ## 📚 RPC API Documentation
 
-All RPC methods exposed by the server are documented in the auto-generated [`rpcDoc.json`](./rpcDoc.json) file.
+All RPC methods exposed by the server are documented in the auto-generated [`rpcDoc.md`](./rpcDoc.md) file.
 
 This file includes:
 - JSON-RPC method names

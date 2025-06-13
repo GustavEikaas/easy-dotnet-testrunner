@@ -4,51 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using EasyDotnet.Utils;
 using StreamJsonRpc;
 
 namespace EasyDotnet;
 
-
 public static class RpcDocGenerator
 {
-
-  private static List<RpcApiDoc> GenerateDocStructure() => [.. AssemblyScanner.GetControllerTypes()
-        .Select(rpcType =>
-        {
-          var methods = rpcType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-              .Where(m => m.GetCustomAttribute<JsonRpcMethodAttribute>() is not null)
-              .Select(m =>
-              {
-                var attr = m.GetCustomAttribute<JsonRpcMethodAttribute>();
-                return new RpcMethodInfo
-                {
-                  Name = m.Name,
-                  RpcPath = attr?.Name ?? m.Name,
-                  Parameters = m.GetParameters()
-                          .Select(p => new RpcParameter
-                          {
-                            Name = p.Name ?? "",
-                            Type = GetFriendlyTypeName(p.ParameterType),
-                            IsOptional = p.IsOptional
-                          })
-                          .ToList(),
-                  ReturnType = GetFriendlyTypeName(m.ReturnType)
-                };
-              })
-              .ToList();
-
-          return new RpcApiDoc
-          {
-            ClassName = rpcType.Name,
-            Methods = methods
-          };
-        })
-        .Where(doc => doc.Methods.Count > 0)];
-
-  public static string GenerateJsonDoc() => JsonSerializer.Serialize(GenerateDocStructure(), new JsonSerializerOptions { WriteIndented = true });
-
   public static string GenerateMarkdownDoc()
   {
     var docs = GenerateDocStructure();
@@ -85,6 +47,9 @@ public static class RpcDocGenerator
     return sb.ToString();
   }
 
+  public static string GenerateJsonDoc() => JsonSerializer.Serialize(GenerateDocStructure(), SerializerOptions);
+
+  private static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
 
   private static string GetFriendlyTypeName(Type type)
   {
@@ -111,17 +76,49 @@ public static class RpcDocGenerator
     };
   }
 
+  private static List<RpcApiDoc> GenerateDocStructure() => [.. AssemblyScanner.GetControllerTypes()
+        .Select(rpcType =>
+        {
+          var methods = rpcType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+              .Where(m => m.GetCustomAttribute<JsonRpcMethodAttribute>() is not null)
+              .Select(m =>
+              {
+                var attr = m.GetCustomAttribute<JsonRpcMethodAttribute>();
+                return new RpcMethodInfo
+                {
+                  Name = m.Name,
+                  RpcPath = attr?.Name ?? m.Name,
+                  Parameters = [.. m.GetParameters()
+                          .Select(p => new RpcParameter
+                          {
+                            Name = p.Name ?? "",
+                            Type = GetFriendlyTypeName(p.ParameterType),
+                            IsOptional = p.IsOptional
+                          })],
+                  ReturnType = GetFriendlyTypeName(m.ReturnType)
+                };
+              })
+              .ToList();
+
+          return new RpcApiDoc
+          {
+            ClassName = rpcType.Name,
+            Methods = methods
+          };
+        })
+        .Where(doc => doc.Methods.Count > 0)];
+
   private class RpcApiDoc
   {
     public string ClassName { get; set; } = "";
-    public List<RpcMethodInfo> Methods { get; set; } = new();
+    public List<RpcMethodInfo> Methods { get; set; } = [];
   }
 
   private class RpcMethodInfo
   {
     public string Name { get; set; } = "";
     public string RpcPath { get; set; } = "";
-    public List<RpcParameter> Parameters { get; set; } = new();
+    public List<RpcParameter> Parameters { get; set; } = [];
     public string ReturnType { get; set; } = "";
   }
 
