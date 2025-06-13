@@ -3,8 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
-using EasyDotnet.MsBuild;
+using EasyDotnet.Msbuild.Models;
 using EasyDotnet.Types;
 
 namespace EasyDotnet.Server;

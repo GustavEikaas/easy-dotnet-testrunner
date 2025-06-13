@@ -9,17 +9,17 @@ public static class VsTestHandler
 {
   public static void RunDiscover(string vsTestPath, DiscoverProjectRequest[] projects)
   {
-    var dllPaths = projects.Select(x => x.dllPath).ToArray();
+    var dllPaths = projects.Select(x => x.DllPath).ToArray();
     var discoveredTests = DiscoverHandler.Discover(vsTestPath, dllPaths);
 
     projects
           .Join(
               discoveredTests,
-              proj => proj.dllPath,
+              proj => proj.DllPath,
               test => test.Key.Replace("\\", "/"),
-              (proj, test) => new { proj.outFile, Tests = test.Value }
+              (proj, test) => new { proj.OutFile, Tests = test.Value }
           )
-          .ToList().ForEach(x => OutFileWriter.WriteDiscoveredTests(x.Tests, x.outFile));
+          .ToList().ForEach(x => OutFileWriter.WriteDiscoveredTests(x.Tests, x.OutFile));
   }
 
   public static void RunTests(
@@ -35,4 +35,4 @@ public static class VsTestHandler
 
 }
 
-public sealed record DiscoverProjectRequest(string dllPath, string outFile);
+public sealed record DiscoverProjectRequest(string DllPath, string OutFile);
