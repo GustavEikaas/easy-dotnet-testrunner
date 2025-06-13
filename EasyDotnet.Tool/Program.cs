@@ -38,7 +38,7 @@ class Program
 
     if (args.Contains("--generate-rpc-docs-md"))
     {
-      var md = RpcDocGenerator.GenerateMarkdownDoc();
+      var md = RpcDocGenerator.GenerateMarkdownDoc().Replace("\r\n", "\n").Replace("\r", "\n");
       File.WriteAllText("./rpcDoc.md", md);
       return 0;
     }
