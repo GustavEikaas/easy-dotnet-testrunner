@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using EasyDotnet.Controllers.Nuget;
 using EasyDotnet.Types;
 
 namespace EasyDotnet.Services;
@@ -44,6 +45,23 @@ public class OutFileWriterService
     else
     {
       testList.ToList().ForEach(x =>
+          writer.WriteLine(JsonSerializer.Serialize(x, SerializerOptions).Replace("\n", "").Replace("\r", ""))
+        );
+    }
+  }
+
+  public void WriteNugetResults(List<NugetPackageMetadata> packages, string outFile)
+  {
+
+    using var writer = new StreamWriter(outFile, false);
+
+    if (packages.Count == 0)
+    {
+      writer.WriteLine("[]");
+    }
+    else
+    {
+      packages.ToList().ForEach(x =>
           writer.WriteLine(JsonSerializer.Serialize(x, SerializerOptions).Replace("\n", "").Replace("\r", ""))
         );
     }
