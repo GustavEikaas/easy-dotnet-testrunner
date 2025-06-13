@@ -19,7 +19,6 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
-    BootstrapMsBuild();
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();
@@ -27,35 +26,15 @@ class Program
       Console.WriteLine($"Assembly Version: {version}");
       return 0;
     }
-
-    if (args.Contains("--generate-rpc-docs"))
+    if (!MSBuildLocator.IsRegistered)
     {
-      var doc = RpcDocGenerator.GenerateJsonDoc();
-      Console.WriteLine(doc);
-      return 0;
+      MSBuildLocator.RegisterDefaults();
     }
-
-    if (args.Contains("--generate-rpc-docs-md"))
-    {
-      var md = RpcDocGenerator.GenerateMarkdownDoc();
-      Console.WriteLine(md);
-      return 0;
-    }
-
 
     await StartServerAsync();
 
     return 0;
   }
-
-  private static void BootstrapMsBuild()
-  {
-    if (!MSBuildLocator.IsRegistered)
-    {
-      MSBuildLocator.RegisterDefaults();
-    }
-  }
-
 
   private static async Task StartServerAsync()
   {
