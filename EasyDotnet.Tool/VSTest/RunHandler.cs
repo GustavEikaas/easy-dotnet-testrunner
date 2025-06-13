@@ -52,9 +52,6 @@ public static class RunHandler
       }
     }
 
-    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
-    {
-      throw new NotImplementedException();
-    }
+    public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo) => throw new NotImplementedException();
   }
 }

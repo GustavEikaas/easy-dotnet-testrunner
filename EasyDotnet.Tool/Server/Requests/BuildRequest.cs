@@ -6,5 +6,5 @@ public sealed record BuildRequest(
   string? Configuration
 )
 {
-    public string ConfigurationOrDefault => Configuration ?? "Debug";
+  public string ConfigurationOrDefault => Configuration ?? "Debug";
 }

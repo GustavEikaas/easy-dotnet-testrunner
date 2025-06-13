@@ -3,9 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EasyDotnet.MTP.RPC.Models;
-
 using Newtonsoft.Json;
-
 using StreamJsonRpc;
 
 namespace EasyDotnet.MTP;
@@ -15,12 +13,9 @@ internal class MtpServer
   private readonly ConcurrentDictionary<Guid, TaskCompletionSource<TestNodeUpdate[]>> _listeners = new();
   private readonly ConcurrentDictionary<Guid, List<TestNodeUpdate>> _buffers = new();
 
+  public void RegisterResponseListener(Guid runId, TaskCompletionSource<TestNodeUpdate[]> task) => _ = _listeners.TryAdd(runId, task);
 
-  public void RegisterResponseListener(Guid runId, TaskCompletionSource<TestNodeUpdate[]> task)
-      => _ = _listeners.TryAdd(runId, task);
-
-  public void RemoveResponseListener(Guid runId)
-      => _ = _listeners.TryRemove(runId, out _);
+  public void RemoveResponseListener(Guid runId) => _ = _listeners.TryRemove(runId, out _);
 
   [JsonRpcMethod("client/attachDebugger", UseSingleObjectParameterDeserialization = true)]
   public static Task AttachDebuggerAsync(AttachDebuggerInfo attachDebuggerInfo) => throw new NotImplementedException();
@@ -53,32 +48,19 @@ internal class MtpServer
   }
 
   [JsonRpcMethod("telemetry/update", UseSingleObjectParameterDeserialization = true)]
-  public Task TelemetryAsync(TelemetryPayload telemetry)
-  {
+  public Task TelemetryAsync(TelemetryPayload telemetry) =>
     // Console.WriteLine("telemetry/update");
-    return Task.CompletedTask;
-  }
+    Task.CompletedTask;
 
   [JsonRpcMethod("client/log")]
-  public Task LogAsync(LogLevel level, string message)
-  {
+  public Task LogAsync(LogLevel level, string message) =>
     // Console.WriteLine("client/log");
-    return Task.CompletedTask;
-  }
-
+    Task.CompletedTask;
 }
 
-public sealed record AttachDebuggerInfo(
-    [property:JsonProperty("processId")]
-    int ProcessId);
+public sealed record AttachDebuggerInfo([property: JsonProperty("processId")] int ProcessId);
 
-public record TelemetryPayload
-(
-    [property: JsonProperty(nameof(TelemetryPayload.EventName))]
-    string EventName,
-
-    [property: JsonProperty("metrics")]
-    IDictionary<string, string> Metrics);
+public record TelemetryPayload([property: JsonProperty(nameof(TelemetryPayload.EventName))] string EventName, [property: JsonProperty("metrics")] IDictionary<string, string> Metrics);
 
 public enum LogLevel
 {

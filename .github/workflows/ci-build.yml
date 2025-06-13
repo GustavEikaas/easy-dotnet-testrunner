@@ -16,6 +16,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Check formatting
+        run: dotnet format ./EasyDotnet.sln --verify-no-changes
+
       - name: Build
         run: dotnet build 
 

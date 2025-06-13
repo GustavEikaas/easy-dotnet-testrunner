@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EasyDotnet.MTP.RPC.Models;
 using EasyDotnet.MTP.RPC.Requests;
 using EasyDotnet.MTP.RPC.Response;
@@ -114,33 +115,33 @@ public class Client : IAsyncDisposable
     return [.. tests.Where(x => x.Node.ExecutionState != "in-progress")];
   }
 
-private async Task<TestNodeUpdate[]> WithCancellation(
-    Guid runId,
-    Func<Task> invokeRpcAsync,
-    CancellationToken cancellationToken)
-{
+  private async Task<TestNodeUpdate[]> WithCancellation(
+      Guid runId,
+      Func<Task> invokeRpcAsync,
+      CancellationToken cancellationToken)
+  {
     var tcs = new TaskCompletionSource<TestNodeUpdate[]>(TaskCreationOptions.RunContinuationsAsynchronously);
 
     _server.RegisterResponseListener(runId, tcs);
 
     using (cancellationToken.Register(() =>
     {
-        tcs.TrySetCanceled(cancellationToken);
-        _server.RemoveResponseListener(runId);
+      tcs.TrySetCanceled(cancellationToken);
+      _server.RemoveResponseListener(runId);
     }))
     {
-        try
-        {
-            await invokeRpcAsync();
-            return await tcs.Task;
-        }
-        catch
-        {
-            _server.RemoveResponseListener(runId);
-            throw;
-        }
+      try
+      {
+        await invokeRpcAsync();
+        return await tcs.Task;
+      }
+      catch
+      {
+        _server.RemoveResponseListener(runId);
+        throw;
+      }
     }
-}
+  }
 
   public async ValueTask DisposeAsync()
   {

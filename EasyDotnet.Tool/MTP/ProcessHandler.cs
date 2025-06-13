@@ -13,8 +13,8 @@ public static class ProcessFactory
 {
   public static IProcessHandle Start(ProcessConfiguration config, bool cleanDefaultEnvironmentVariableIfCustomAreProvided = false)
   {
-    string fullPath = config.FileName; // Path.GetFullPath(startInfo.FileName);
-    string workingDirectory = config.WorkingDirectory
+    var fullPath = config.FileName; // Path.GetFullPath(startInfo.FileName);
+    var workingDirectory = config.WorkingDirectory
         .OrDefault(Path.GetDirectoryName(config.FileName).OrDefault(Directory.GetCurrentDirectory()));
 
     ProcessStartInfo processStartInfo = new()
@@ -37,7 +37,7 @@ public static class ProcessFactory
         processStartInfo.EnvironmentVariables.Clear();
       }
 
-      foreach (KeyValuePair<string, string> kvp in config.EnvironmentVariables)
+      foreach (var kvp in config.EnvironmentVariables)
       {
         if (kvp.Value is null)
         {

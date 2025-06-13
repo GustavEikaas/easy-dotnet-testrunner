@@ -5,9 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
+using EasyDotnet;
 using EasyDotnet.Server;
 
 using Microsoft.Build.Locator;
+using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json.Serialization;
 
@@ -52,20 +54,22 @@ class Program
 
   private static async Task RespondToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
   {
-
     var jsonMessageFormatter = new JsonMessageFormatter();
     jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
     {
-      NamingStrategy = new CamelCaseNamingStrategy()
+      NamingStrategy = new CamelCaseNamingStrategy(),
     };
+    var provider = DiModules.BuildServiceProvider();
+    var rpcHandler = provider.GetRequiredService<Server>();
 
     var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
-    var jsonRpc = new JsonRpc(handler, new Server());
-    // if(true == true){
-    //   var ts = jsonRpc.TraceSource;
-    //   ts.Switch.Level = SourceLevels.Verbose;
-    //   ts.Listeners.Add(new ConsoleTraceListener());
-    // }
+    var jsonRpc = new JsonRpc(handler, rpcHandler);
+    if (true == true)
+    {
+      var ts = jsonRpc.TraceSource;
+      ts.Switch.Level = SourceLevels.Verbose;
+      ts.Listeners.Add(new ConsoleTraceListener());
+    }
     jsonRpc.StartListening();
     Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
     await jsonRpc.Completion;
