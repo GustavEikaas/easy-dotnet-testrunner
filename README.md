@@ -17,3 +17,17 @@ It powers the plugin’s test discovery and execution features, supporting both 
 
 This server is an internal component of the `easy-dotnet.nvim` plugin and is **not intended for standalone use**.
 
+## 📚 RPC API Documentation
+
+All RPC methods exposed by the server are documented in the auto-generated [`rpcDoc.md`](./rpcDoc.md) file.
+
+This file includes:
+- JSON-RPC method names
+- Parameter names, types, and optionality
+- Return types
+- The associated controller for each method
+
+You can regenerate this file at any time by running the server with the `--generate-rpc-docs` flag:
+
+```bash
+dotnet run -- --generate-rpc-docs

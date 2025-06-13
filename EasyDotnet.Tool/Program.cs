@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
@@ -19,6 +20,7 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
+    BootstrapMsBuild();
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();
@@ -26,15 +28,35 @@ class Program
       Console.WriteLine($"Assembly Version: {version}");
       return 0;
     }
-    if (!MSBuildLocator.IsRegistered)
+
+    if (args.Contains("--generate-rpc-docs"))
     {
-      MSBuildLocator.RegisterDefaults();
+      var doc = RpcDocGenerator.GenerateJsonDoc();
+      File.WriteAllText("./rpcDoc.json", doc);
+      return 0;
     }
+
+    if (args.Contains("--generate-rpc-docs-md"))
+    {
+      var md = RpcDocGenerator.GenerateMarkdownDoc().Replace("\r\n", "\n").Replace("\r", "\n");
+      File.WriteAllText("./rpcDoc.md", md);
+      return 0;
+    }
+
 
     await StartServerAsync();
 
     return 0;
   }
+
+  private static void BootstrapMsBuild()
+  {
+    if (!MSBuildLocator.IsRegistered)
+    {
+      MSBuildLocator.RegisterDefaults();
+    }
+  }
+
 
   private static async Task StartServerAsync()
   {

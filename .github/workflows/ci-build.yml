@@ -22,3 +22,18 @@ jobs:
       - name: Build
         run: dotnet build 
 
+      - name: Generate RPC docs
+        run: dotnet run --project ./EasyDotnet.Tool/EasyDotnet.csproj --generate-rpc-docs-md
+
+      - name: Check for uncommitted changes (rpcDoc.md)
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add rpcDoc.md
+          git status
+          git diff HEAD -- rpcDoc.md || true
+          if ! git diff --quiet HEAD -- rpcDoc.md; then
+            echo "rpcDoc.md is outdated. Please regenerate and commit changes."
+            exit 1
+          fi
+
