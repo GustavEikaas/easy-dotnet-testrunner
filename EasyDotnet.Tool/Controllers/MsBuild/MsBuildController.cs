@@ -25,4 +25,15 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
 
     return new BuildResultResponse(buildResult.Result.OverallResult == BuildResultCode.Success);
   }
+
+  [JsonRpcMethod("msbuild/query-properties")]
+  public DotnetProjectPropertiesResponse QueryProperties(QueryProjectPropertiesRequest request)
+  {
+    if (!clientService.IsInitialized)
+    {
+      throw new Exception("Client has not initialized yet");
+    }
+
+    return msBuild.QueryProject(request.TargetPath, request.ConfigurationOrDefault).ToResponse();
+  }
 }
