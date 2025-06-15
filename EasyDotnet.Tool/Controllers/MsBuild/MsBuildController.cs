@@ -1,20 +1,17 @@
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using EasyDotnet.Services;
-using Microsoft.Build.Execution;
 using StreamJsonRpc;
 
 namespace EasyDotnet.Controllers.MsBuild;
 
-public class MsBuildController(ClientService clientService, MsBuildService msBuild, OutFileWriterService outFileWriterService) : BaseController
+public class MsBuildController(NotificationService notificationService, ClientService clientService, MsBuildService msBuild, OutFileWriterService outFileWriterService) : BaseController
 {
-
   [JsonRpcMethod("msbuild/build")]
   public BuildResultResponse Build(BuildRequest request)
   {
-    if (!clientService.IsInitialized)
-    {
-      throw new Exception("Client has not initialized yet");
-    }
+    clientService.ThrowIfNotInitialized();
 
     var buildResult = msBuild.RequestBuild(request.TargetPath, request.ConfigurationOrDefault);
 
@@ -23,17 +20,37 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
       outFileWriterService.WriteBuildResult(buildResult.Messages, request.OutFile);
     }
 
-    return new BuildResultResponse(buildResult.Result.OverallResult == BuildResultCode.Success);
+    return new BuildResultResponse(buildResult.Success);
+  }
+
+  [JsonRpcMethod("msbuild/restore")]
+  public BuildResultResponse Restore(string targetPath)
+  {
+    clientService.ThrowIfNotInitialized();
+
+    var buildResult = msBuild.RequestRestore(targetPath);
+
+    return new BuildResultResponse(buildResult.Success);
   }
 
   [JsonRpcMethod("msbuild/query-properties")]
   public DotnetProjectPropertiesResponse QueryProperties(QueryProjectPropertiesRequest request)
   {
-    if (!clientService.IsInitialized)
-    {
-      throw new Exception("Client has not initialized yet");
-    }
+    clientService.ThrowIfNotInitialized();
 
     return msBuild.QueryProject(request.TargetPath, request.ConfigurationOrDefault, request.TargetFramework).ToResponse();
+  }
+
+  [JsonRpcMethod("msbuild/add-package-reference")]
+  public async Task AddPackageReference(string targetPath, string packageName, CancellationToken cancellationToken)
+  {
+    clientService.ThrowIfNotInitialized();
+    var res = await msBuild.AddPackageAsync(targetPath, packageName, cancellationToken);
+    if (!res)
+    {
+      throw new Exception("Failed to add package reference");
+    }
+
+    await notificationService.RequestRestoreAsync(targetPath);
   }
 }

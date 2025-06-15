@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
 using Microsoft.Build.Framework;
@@ -10,11 +12,24 @@ namespace EasyDotnet.Services;
 public class MsBuildService
 {
 
+  public BuildResult RequestRestore(string targetPath)
+  {
+    using var pc = new ProjectCollection();
+    var buildRequest = new BuildRequestData(targetPath, null, null, ["Restore"], null);
+    var logger = new InMemoryLogger();
+
+    var parameters = new BuildParameters(pc) { Loggers = [logger] };
+
+    var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
+
+    return new BuildResult(Success: result.OverallResult == BuildResultCode.Success, result, logger.Messages);
+  }
+
   public BuildResult RequestBuild(string targetPath, string configuration)
   {
     var properties = new Dictionary<string, string?> { { "Configuration", configuration } };
 
-    var pc = new ProjectCollection(properties);
+    using var pc = new ProjectCollection();
     var buildRequest = new BuildRequestData(targetPath, properties, null, ["Restore", "Build"], null);
     var logger = new InMemoryLogger();
 
@@ -22,7 +37,7 @@ public class MsBuildService
 
     var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
 
-    return new BuildResult(result, logger.Messages);
+    return new BuildResult(Success: result.OverallResult == BuildResultCode.Success, result, logger.Messages);
   }
 
   public DotnetProjectProperties QueryProject(string targetPath, string configuration, string? targetFramework)
@@ -32,7 +47,7 @@ public class MsBuildService
     {
       properties.Add("TargetFramework", targetFramework);
     }
-    var pc = new ProjectCollection(properties);
+    using var pc = new ProjectCollection();
 
     var project = pc.LoadProject(targetPath);
     project.ReevaluateIfNecessary();
@@ -56,6 +71,37 @@ public class MsBuildService
     );
   }
 
+  public async Task<bool> AddPackageAsync(string projectPath, string packageId, CancellationToken cancellationToken, string? version = null)
+  {
+    try
+    {
+      var arguments = $"add \"{projectPath}\" package {packageId}";
+
+      if (!string.IsNullOrEmpty(version))
+      {
+        arguments += $" --version {version}";
+      }
+
+      var result = await RunDotNetCommandAsync(arguments, cancellationToken);
+
+      if (result.Success)
+      {
+        return true;
+      }
+      else
+      {
+        Console.WriteLine($"Failed to add package {packageId}: {result.Error}");
+        return false;
+      }
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine($"Error adding package {packageId}: {ex.Message}");
+      return false;
+    }
+  }
+
+
   private static bool GetBoolProperty(Project project, string name) =>
     string.Equals(project.GetPropertyValue(name), "true", StringComparison.OrdinalIgnoreCase);
 
@@ -64,9 +110,48 @@ public class MsBuildService
     var value = project.GetPropertyValue(name);
     return string.IsNullOrWhiteSpace(value) ? null : value;
   }
+  private async Task<CommandResult> RunDotNetCommandAsync(string arguments, CancellationToken cancellationToken)
+  {
+    var processStartInfo = new ProcessStartInfo
+    {
+      FileName = "dotnet",
+      Arguments = arguments,
+      RedirectStandardOutput = true,
+      RedirectStandardError = true,
+      UseShellExecute = false,
+      CreateNoWindow = true
+    };
+
+    using var process = new Process { StartInfo = processStartInfo };
+    process.Start();
+
+    var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+    var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+
+    await process.WaitForExitAsync(cancellationToken);
+
+    var output = await outputTask;
+    var error = await errorTask;
+
+    return new CommandResult
+    {
+      Success = process.ExitCode == 0,
+      Output = output,
+      Error = error,
+      ExitCode = process.ExitCode
+    };
+  }
+
+  private class CommandResult
+  {
+    public bool Success { get; set; }
+    public string Output { get; set; }
+    public string Error { get; set; }
+    public int ExitCode { get; set; }
+  }
 }
 
-public record BuildResult(Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
+public record BuildResult(bool Success, Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
 
 
 public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
