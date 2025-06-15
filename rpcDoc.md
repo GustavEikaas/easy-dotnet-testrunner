@@ -64,12 +64,27 @@ _No parameters_
 
 **Returns:** `BuildResultResponse`
 
+### `msbuild/restore`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| targetPath | string |   |
+
+**Returns:** `BuildResultResponse`
+
 ### `msbuild/query-properties`
 | Parameter | Type | Optional |
 |-----------|------|----------|
 | request | QueryProjectPropertiesRequest |   |
 
 **Returns:** `DotnetProjectPropertiesResponse`
+
+### `msbuild/add-package-reference`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| targetPath | string |   |
+| packageName | string |   |
+
+**Returns:** `Task`
 
 ---
 
