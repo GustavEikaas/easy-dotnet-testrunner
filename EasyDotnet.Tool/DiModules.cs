@@ -15,6 +15,7 @@ public static class DiModules
     services.AddSingleton<ClientService>();
 
     services.AddTransient<MsBuildService>();
+    services.AddTransient<NotificationService>();
     services.AddTransient<NugetService>();
     services.AddTransient<OutFileWriterService>();
     services.AddTransient<VsTestService>();
