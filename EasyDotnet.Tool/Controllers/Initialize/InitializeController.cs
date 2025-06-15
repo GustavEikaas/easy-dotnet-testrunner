@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using EasyDotnet.Notifications;
 using EasyDotnet.Services;
 using EasyDotnet.Utils;
 using StreamJsonRpc;
@@ -37,10 +38,10 @@ public class InitializeController(ClientService clientService) : BaseController
     clientService.IsInitialized = true;
     clientService.ProjectInfo = request.ProjectInfo;
     clientService.ClientInfo = request.ClientInfo;
-    return new InitializeResponse(new ServerInfo("EasyDotnet", serverVersion.ToString()), new ServerCapabilities(Get_RPC_Paths()));
+    return new InitializeResponse(new ServerInfo("EasyDotnet", serverVersion.ToString()), new ServerCapabilities(GetRpcPaths(), GetRpcNotifications()));
   }
 
-  private static List<string> Get_RPC_Paths() =>
+  private static List<string> GetRpcPaths() =>
       [.. AssemblyScanner.GetControllerTypes()
           .SelectMany(rpcType =>
               rpcType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
@@ -48,4 +49,11 @@ public class InitializeController(ClientService clientService) : BaseController
                   .Select(m => m.GetCustomAttribute<JsonRpcMethodAttribute>()!.Name)
           )];
 
+  private static List<string> GetRpcNotifications() =>
+      [.. AssemblyScanner.GetNotificationDispatchers()
+          .SelectMany(rpcType =>
+              rpcType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                  .Where(m => m.GetCustomAttribute<RpcNotificationAttribute>() is not null)
+                  .Select(m => m.GetCustomAttribute<RpcNotificationAttribute>()!.Name)
+          )];
 }
