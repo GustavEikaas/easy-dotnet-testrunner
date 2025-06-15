@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using EasyDotnet.Services;
+using EasyDotnet.Utils;
 using StreamJsonRpc;
 
 namespace EasyDotnet.Controllers.Initialize;
@@ -34,6 +37,15 @@ public class InitializeController(ClientService clientService) : BaseController
     clientService.IsInitialized = true;
     clientService.ProjectInfo = request.ProjectInfo;
     clientService.ClientInfo = request.ClientInfo;
-    return new InitializeResponse(new ServerInfo("EasyDotnet", serverVersion.ToString()));
+    return new InitializeResponse(new ServerInfo("EasyDotnet", serverVersion.ToString()), new ServerCapabilities(Get_RPC_Paths()));
   }
+
+  private static List<string> Get_RPC_Paths() =>
+      [.. AssemblyScanner.GetControllerTypes()
+          .SelectMany(rpcType =>
+              rpcType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                  .Where(m => m.GetCustomAttribute<JsonRpcMethodAttribute>() is not null)
+                  .Select(m => m.GetCustomAttribute<JsonRpcMethodAttribute>()!.Name)
+          )];
+
 }
