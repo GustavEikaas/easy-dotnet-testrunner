@@ -19,6 +19,17 @@
 
 ---
 
+## SolutionController
+
+### `solution/list-projects`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| solutionFilePath | string |   |
+
+**Returns:** `List<SolutionFileProjectResponse>`
+
+---
+
 ## NugetController
 
 ### `nuget/list-sources`
