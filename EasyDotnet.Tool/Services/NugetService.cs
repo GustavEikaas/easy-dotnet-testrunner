@@ -5,7 +5,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 
 namespace EasyDotnet.Services;
 
@@ -19,6 +21,45 @@ public class NugetService
     var sources = sourceProvider.LoadPackageSources();
     return [.. sources];
   }
+
+  public async Task<IEnumerable<NuGetVersion>> GetPackageVersionsAsync(
+      string packageId,
+      CancellationToken cancellationToken,
+      bool includePrerelease = false,
+      List<string>? sourceNames = null)
+  {
+    var logger = NullLogger.Instance;
+    var cache = new SourceCacheContext();
+
+    var sources = (sourceNames is { Count: > 0 }
+        ? GetSources().Where(s => sourceNames.Contains(s.Name))
+        : GetSources())
+        .ToList();
+
+    var versionTasks = sources.Select(async source =>
+    {
+      try
+      {
+        var repo = Repository.Factory.GetCoreV3(source.Source);
+        var resource = await repo.GetResourceAsync<FindPackageByIdResource>(cancellationToken);
+        var versions = await resource.GetAllVersionsAsync(packageId, cache, logger, cancellationToken);
+
+        return [.. versions.Where(v => includePrerelease || !v.IsPrerelease)];
+      }
+      catch
+      {
+        return Enumerable.Empty<NuGetVersion>();
+      }
+    });
+
+    var versionLists = await Task.WhenAll(versionTasks);
+
+    return versionLists
+        .SelectMany(v => v)
+        .Distinct()
+        .OrderByDescending(v => v);
+  }
+
 
   public async Task<Dictionary<string, IEnumerable<IPackageSearchMetadata>>> SearchAllSourcesByNameAsync(
         string searchTerm,
