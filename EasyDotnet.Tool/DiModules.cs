@@ -1,3 +1,5 @@
+using System.IO.Abstractions;
+using DotNetOutdated.Core.Services;
 using EasyDotnet.Services;
 using EasyDotnet.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +22,16 @@ public static class DiModules
     services.AddTransient<OutFileWriterService>();
     services.AddTransient<VsTestService>();
     services.AddTransient<MtpService>();
+    services.AddTransient<OutdatedService>();
+    services.AddSingleton<IFileSystem, FileSystem>();
+
+    //Dotnet oudated
+    services.AddSingleton<IProjectAnalysisService, ProjectAnalysisService>();
+    services.AddSingleton<IDotNetRunner, DotNetRunner>();
+    services.AddSingleton<IDependencyGraphService, DependencyGraphService>();
+    services.AddSingleton<IDotNetRestoreService, DotNetRestoreService>();
+    services.AddSingleton<INuGetPackageInfoService, NuGetPackageInfoService>();
+    services.AddSingleton<INuGetPackageResolutionService, NuGetPackageResolutionService>();
 
     AssemblyScanner.GetControllerTypes().ForEach(x => services.AddTransient(x));
 
