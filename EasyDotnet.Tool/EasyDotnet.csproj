@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,13 +13,12 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
+    <UserSecretsId>dd958ca3-2fe8-4c81-8cc5-3d2203614c6b</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" Version="15.1.548" />
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
@@ -35,5 +33,4 @@
     <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
     <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
   </ItemGroup>
-
 </Project>
