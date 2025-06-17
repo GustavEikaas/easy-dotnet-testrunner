@@ -33,6 +33,17 @@ public class MsBuildController(NotificationService notificationService, ClientSe
     return new BuildResultResponse(buildResult.Success);
   }
 
+  [JsonRpcMethod("msbuild/pack")]
+  public PackResultResponse Pack(string targetPath, string? configuration)
+  {
+    clientService.ThrowIfNotInitialized();
+    var configurationOrDefault = configuration ?? "Release";
+
+    var buildResult = msBuild.RequestPack(targetPath, configurationOrDefault);
+
+    return new PackResultResponse(buildResult.Success, buildResult.FilePath);
+  }
+
   [JsonRpcMethod("msbuild/query-properties")]
   public DotnetProjectPropertiesResponse QueryProperties(QueryProjectPropertiesRequest request)
   {

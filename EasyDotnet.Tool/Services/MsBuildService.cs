@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Build.Evaluation;
@@ -38,6 +39,50 @@ public class MsBuildService
     var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
 
     return new BuildResult(Success: result.OverallResult == BuildResultCode.Success, result, logger.Messages);
+  }
+
+  public PackResult RequestPack(string targetPath, string configuration)
+  {
+    var properties = new Dictionary<string, string?>
+    {
+        { "Configuration", configuration },
+    };
+
+    using var pc = new ProjectCollection();
+
+    var project = pc.LoadProject(targetPath);
+    var packageId = project.GetPropertyValue("PackageId");
+    if (string.IsNullOrWhiteSpace(packageId))
+    {
+      throw new Exception("PackageId should not be null");
+    }
+
+    var version = project.GetPropertyValue("Version");
+    if (string.IsNullOrWhiteSpace(version))
+    {
+      throw new Exception("Version should not be null");
+    }
+
+    var name = $"{packageId}.{version}.nupkg";
+
+    var outputPath = Path.Combine(
+        Path.GetDirectoryName(targetPath)!,
+        "bin",
+        configuration,
+        name
+    );
+
+    var buildRequest = new BuildRequestData(targetPath, properties, null, ["Pack"], null);
+    var logger = new InMemoryLogger();
+
+    var parameters = new BuildParameters(pc)
+    {
+      Loggers = [logger]
+    };
+
+    var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
+
+    return new PackResult(Success: result.OverallResult == BuildResultCode.Success, FilePath: outputPath, result, logger.Messages);
   }
 
   public DotnetProjectProperties QueryProject(string targetPath, string configuration, string? targetFramework)
@@ -152,7 +197,7 @@ public class MsBuildService
 }
 
 public record BuildResult(bool Success, Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
-
+public record PackResult(bool Success, string FilePath, Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
 
 public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
 
