@@ -20,43 +20,34 @@ public class OutdatedService(IProjectAnalysisService projectAnalysisService, INu
               VersionLock versionLock = VersionLock.None,
               string runtime = "")
   {
-    var result = new List<DependencyInfo>();
 
-    // Analyze the project
     var projects = await projectAnalysisService.AnalyzeProjectAsync(
         projectPath,
-        false,
+        runRestore: false,
         includeTransitive,
         transitiveDepth,
         runtime);
 
-    foreach (var project in projects)
-    {
-      foreach (var targetFramework in project.TargetFrameworks)
-      {
-        var dependencies = targetFramework.Dependencies.Values
-            .OrderBy(d => d.IsTransitive)
-            .ThenBy(d => d.Name);
-
-        foreach (var dependency in dependencies)
-        {
-          var dependencyInfo = await AnalyzeDependencyAsync(
-              project,
-              targetFramework,
-              dependency,
+    var dependencyInfos = await Task.WhenAll(
+        projects
+            .SelectMany(p => p.TargetFrameworks.Select(tf => (Project: p, TargetFramework: tf)))
+            .SelectMany(pt => pt.TargetFramework.Dependencies.Values
+                .OrderBy(d => d.IsTransitive)
+                .ThenBy(d => d.Name)
+                .Select(dep => (pt.Project, pt.TargetFramework, Dependency: dep)))
+            .Select(async triplet =>
+            {
+              var info = await AnalyzeDependencyAsync(
+              triplet.Project,
+              triplet.TargetFramework,
+              triplet.Dependency,
               prereleaseReporting,
               versionLock,
               includeUpToDate);
+              return info;
+            }));
 
-          if (dependencyInfo != null)
-          {
-            result.Add(dependencyInfo);
-          }
-        }
-      }
-    }
-
-    return result;
+    return [.. dependencyInfos.Where(info => info != null).OfType<DependencyInfo>()];
   }
 
   private async Task<DependencyInfo?> AnalyzeDependencyAsync(
@@ -68,71 +59,51 @@ public class OutdatedService(IProjectAnalysisService projectAnalysisService, INu
       bool includeUpToDate)
   {
     var referencedVersion = dependency.ResolvedVersion;
-    NuGetVersion? latestVersion = null;
-
-    if (referencedVersion != null)
-    {
-      latestVersion = await nugetService.ResolvePackageVersions(
-          dependency.Name,
-          referencedVersion,
-          project.Sources,
-          dependency.VersionRange,
-          versionLock,
-          prereleaseReporting,
-          string.Empty, // prereleaseLabel
-          targetFramework.Name,
-          project.FilePath,
-          dependency.IsDevelopmentDependency,
-          0, // olderThanDays
-          false); // ignoreFailedSources
-    }
-
-    var isOutdated = referencedVersion != null &&
-                      latestVersion != null &&
-                      referencedVersion != latestVersion;
-
-    // Only include if outdated or if includeUpToDate is true
-    if (!isOutdated && !includeUpToDate)
+    if (referencedVersion is null)
     {
       return null;
     }
 
-    return new DependencyInfo
+    var latestVersion = await nugetService.ResolvePackageVersions(
+        dependency.Name,
+        referencedVersion,
+        project.Sources,
+        dependency.VersionRange,
+        versionLock,
+        prereleaseReporting,
+        prereleaseLabel: string.Empty,
+        targetFramework.Name,
+        project.FilePath,
+        dependency.IsDevelopmentDependency,
+        olderThanDays: 0,
+        ignoreFailedSources: false);
+
+    var isOutdated = latestVersion is not null && referencedVersion != latestVersion;
+
+    return !isOutdated && !includeUpToDate
+      ? null
+      : new DependencyInfo
+      {
+        Name = dependency.Name,
+        CurrentVersion = referencedVersion.ToString(),
+        LatestVersion = latestVersion?.ToString() ?? "Unknown",
+        TargetFramework = targetFramework.Name.ToString(),
+        IsOutdated = isOutdated,
+        IsTransitive = dependency.IsTransitive,
+        UpgradeSeverity = GetUpgradeSeverity(referencedVersion, latestVersion)
+      };
+  }
+
+  private static string GetUpgradeSeverity(NuGetVersion? current, NuGetVersion? latest) =>
+    (current, latest) switch
     {
-      Name = dependency.Name,
-      CurrentVersion = referencedVersion?.ToString() ?? "Unknown",
-      LatestVersion = latestVersion?.ToString() ?? "Unknown",
-      TargetFramework = targetFramework.Name.ToString(),
-      IsOutdated = isOutdated,
-      IsTransitive = dependency.IsTransitive,
-      UpgradeSeverity = GetUpgradeSeverity(referencedVersion, latestVersion)
+      (null, _) or (_, null) => "None",
+      var (c, l) when c.Equals(l) => "None",
+      var (c, l) when c.Major != l.Major => "Major",
+      var (c, l) when c.Minor != l.Minor => "Minor",
+      var (c, l) when c.Patch != l.Patch => "Patch",
+      _ => "Unknown"
     };
-  }
-
-  private static string GetUpgradeSeverity(NuGetVersion? current, NuGetVersion? latest)
-  {
-    if (current == null || latest == null || current.Equals(latest))
-    {
-      return "None";
-    }
-
-    if (current.Major != latest.Major)
-    {
-      return "Major";
-    }
-
-    if (current.Minor != latest.Minor)
-    {
-      return "Minor";
-    }
-
-    if (current.Patch != latest.Patch)
-    {
-      return "Patch";
-    }
-
-    return "Unknown";
-  }
 
   public class DependencyInfo
   {
