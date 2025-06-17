@@ -37,6 +37,15 @@ _No parameters_
 
 **Returns:** `List<NugetSourceResponse>`
 
+### `nuget/get-package-versions`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| packageId | string |   |
+| sources | List<string> | ✅  |
+| includePrerelease | bool | ✅  |
+
+**Returns:** `Task<List<string>>`
+
 ### `nuget/search-packages`
 | Parameter | Type | Optional |
 |-----------|------|----------|

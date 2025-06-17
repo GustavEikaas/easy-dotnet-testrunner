@@ -28,6 +28,20 @@ public class NugetController(ClientService clientService, NugetService nugetServ
     return new NugetPushResponse(sources);
   }
 
+  [JsonRpcMethod("nuget/get-package-versions")]
+  public async Task<List<string>> GetPackageVersions(string packageId, List<string>? sources = null, bool includePrerelease = false)
+  {
+    clientService.ThrowIfNotInitialized();
+
+    var versions = await nugetService.GetPackageVersionsAsync(
+        packageId,
+        new CancellationToken(),
+        includePrerelease,
+        sources);
+
+    return [.. versions.Select(v => v.ToNormalizedString())];
+  }
+
   [JsonRpcMethod("nuget/search-packages")]
   public async Task<FileResultResponse> SearchPackages(string searchTerm, List<string>? sources = null)
   {
