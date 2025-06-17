@@ -19,6 +19,15 @@ public class NugetController(ClientService clientService, NugetService nugetServ
     return [.. sources.Select(x => x.ToResponse())];
   }
 
+  [JsonRpcMethod("nuget/push")]
+  public async Task<NugetPushResponse> PushPackages(List<string> packagePaths, string source, string? apiKey = null)
+  {
+    clientService.ThrowIfNotInitialized();
+
+    var sources = await nugetService.PushPackageAsync(packagePaths, source, apiKey);
+    return new NugetPushResponse(sources);
+  }
+
   [JsonRpcMethod("nuget/search-packages")]
   public async Task<FileResultResponse> SearchPackages(string searchTerm, List<string>? sources = null)
   {
