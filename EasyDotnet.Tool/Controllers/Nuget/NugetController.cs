@@ -19,6 +19,15 @@ public class NugetController(ClientService clientService, NugetService nugetServ
     return [.. sources.Select(x => x.ToResponse())];
   }
 
+  [JsonRpcMethod("nuget/push")]
+  public async Task<NugetPushResponse> PushPackages(List<string> packagePaths, string source, string? apiKey = null)
+  {
+    clientService.ThrowIfNotInitialized();
+
+    var sources = await nugetService.PushPackageAsync(packagePaths, source, apiKey);
+    return new NugetPushResponse(sources);
+  }
+
   [JsonRpcMethod("nuget/get-package-versions")]
   public async Task<List<string>> GetPackageVersions(string packageId, List<string>? sources = null, bool includePrerelease = false)
   {
