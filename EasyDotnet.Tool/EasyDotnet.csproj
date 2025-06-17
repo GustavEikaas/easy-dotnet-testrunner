@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,7 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.18</Version>
+    <Version>0.0.20</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
@@ -15,12 +14,10 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="DotNetOutdatedTool.Core" Version="4.6.8" />
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" Version="15.1.548" />
@@ -36,5 +33,4 @@
     <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
     <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
   </ItemGroup>
-
 </Project>

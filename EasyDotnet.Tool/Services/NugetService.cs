@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -103,5 +104,38 @@ public class NugetService
     return taskMap.ToDictionary(
         kvp => kvp.Key,
         kvp => kvp.Value.Result);
+  }
+
+  public async Task<bool> PushPackageAsync(List<string> packages, string sourceUrl, string? apiKey)
+  {
+    var notFound = packages.FirstOrDefault(x => !File.Exists(x));
+    if (notFound is not null)
+    {
+      throw new FileNotFoundException("Package not found", notFound);
+    }
+
+    var packageUpdateResource = await GetPackageUpdateResourceAsync(sourceUrl);
+
+    await packageUpdateResource.Push(
+        packages,
+        symbolSource: null,
+        timeoutInSecond: 300,
+        disableBuffering: false,
+        getApiKey: _ => apiKey,
+        getSymbolApiKey: null,
+        noServiceEndpoint: false,
+        skipDuplicate: false,
+        symbolPackageUpdateResource: null,
+        log: NullLogger.Instance
+    );
+
+    return true;
+  }
+
+  private async Task<PackageUpdateResource> GetPackageUpdateResourceAsync(string sourceUrl)
+  {
+    var packageSource = new PackageSource(sourceUrl);
+    var sourceRepository = Repository.Factory.GetCoreV3(packageSource);
+    return await sourceRepository.GetResourceAsync<PackageUpdateResource>();
   }
 }

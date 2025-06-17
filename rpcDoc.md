@@ -19,6 +19,17 @@
 
 ---
 
+## UserSecretsController
+
+### `user-secrets/init`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| projectPath | string |   |
+
+**Returns:** `ProjectUserSecretsInitResponse`
+
+---
+
 ## SolutionController
 
 ### `solution/list-projects`
@@ -36,6 +47,15 @@
 _No parameters_
 
 **Returns:** `List<NugetSourceResponse>`
+
+### `nuget/push`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| packagePaths | List<string> |   |
+| source | string |   |
+| apiKey | string | ✅  |
+
+**Returns:** `Task<NugetPushResponse>`
 
 ### `nuget/get-package-versions`
 | Parameter | Type | Optional |
@@ -90,6 +110,14 @@ _No parameters_
 | targetPath | string |   |
 
 **Returns:** `BuildResultResponse`
+
+### `msbuild/pack`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| targetPath | string |   |
+| configuration | string |   |
+
+**Returns:** `PackResultResponse`
 
 ### `msbuild/query-properties`
 | Parameter | Type | Optional |
