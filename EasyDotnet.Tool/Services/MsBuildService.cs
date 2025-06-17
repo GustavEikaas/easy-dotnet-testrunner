@@ -70,7 +70,6 @@ public class MsBuildService
         "bin",
         configuration,
         name
-
     );
 
     var buildRequest = new BuildRequestData(targetPath, properties, null, ["Pack"], null);
@@ -199,7 +198,6 @@ public class MsBuildService
 
 public record BuildResult(bool Success, Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
 public record PackResult(bool Success, string FilePath, Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
-
 
 public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
 
