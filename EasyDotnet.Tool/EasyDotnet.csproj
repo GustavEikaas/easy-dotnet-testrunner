@@ -6,14 +6,13 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.19</Version>
+    <Version>0.0.20</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
-    <UserSecretsId>dd958ca3-2fe8-4c81-8cc5-3d2203614c6b</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />

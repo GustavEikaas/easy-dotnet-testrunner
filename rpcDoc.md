@@ -19,6 +19,17 @@
 
 ---
 
+## UserSecretsController
+
+### `user-secrets/init`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| projectPath | string |   |
+
+**Returns:** `ProjectUserSecretsInitResponse`
+
+---
+
 ## SolutionController
 
 ### `solution/list-projects`
