@@ -41,6 +41,18 @@
 
 ---
 
+## OutdatedController
+
+### `outdated/packages`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| targetPath | string |   |
+| includeTransitive | bool? | ✅  |
+
+**Returns:** `Task<FileResultResponse>`
+
+---
+
 ## NugetController
 
 ### `nuget/list-sources`
