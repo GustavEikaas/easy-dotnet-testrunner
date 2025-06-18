@@ -13,7 +13,7 @@ public class SolutionController() : BaseController
     var solution = SolutionFile.Parse(solutionFilePath);
     var projects = solution.ProjectsInOrder
         .Where(p => p.ProjectType == SolutionProjectType.KnownToBeMSBuildFormat)
-        .Select(x => new SolutionFileProjectResponse(x.ProjectName, x.RelativePath, x.AbsolutePath))
+        .Select(x => x.ToResponse())
         .ToList();
 
     return projects;
