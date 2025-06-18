@@ -10,6 +10,10 @@ The server communicates via named pipes using JSON-RPC and provides a unified re
 
 * JSON-RPC 2.0 communication over named pipes
 * Asynchronous, multi-client server support
+* MsBuild integration
+* Nuget integration
+* MTP integration
+* VsTest integration
 
 ## Use Case
 
