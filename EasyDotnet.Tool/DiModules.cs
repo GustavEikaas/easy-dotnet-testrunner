@@ -25,6 +25,7 @@ public static class DiModules
     services.AddTransient<MtpService>();
     services.AddTransient<OutdatedService>();
     services.AddSingleton<IFileSystem, FileSystem>();
+    services.AddSingleton<RoslynService>();
 
     //Dotnet oudated
     services.AddSingleton<IProjectAnalysisService, ProjectAnalysisService>();
