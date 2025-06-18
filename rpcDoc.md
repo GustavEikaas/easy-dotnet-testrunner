@@ -19,6 +19,17 @@
 
 ---
 
+## UserSecretsController
+
+### `user-secrets/init`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| projectPath | string |   |
+
+**Returns:** `ProjectUserSecretsInitResponse`
+
+---
+
 ## SolutionController
 
 ### `solution/list-projects`
@@ -30,12 +41,42 @@
 
 ---
 
+## OutdatedController
+
+### `outdated/packages`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| targetPath | string |   |
+| includeTransitive | bool? | ✅  |
+
+**Returns:** `Task<FileResultResponse>`
+
+---
+
 ## NugetController
 
 ### `nuget/list-sources`
 _No parameters_
 
 **Returns:** `List<NugetSourceResponse>`
+
+### `nuget/push`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| packagePaths | List<string> |   |
+| source | string |   |
+| apiKey | string | ✅  |
+
+**Returns:** `Task<NugetPushResponse>`
+
+### `nuget/get-package-versions`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| packageId | string |   |
+| sources | List<string> | ✅  |
+| includePrerelease | bool | ✅  |
+
+**Returns:** `Task<List<string>>`
 
 ### `nuget/search-packages`
 | Parameter | Type | Optional |
@@ -81,6 +122,14 @@ _No parameters_
 | targetPath | string |   |
 
 **Returns:** `BuildResultResponse`
+
+### `msbuild/pack`
+| Parameter | Type | Optional |
+|-----------|------|----------|
+| targetPath | string |   |
+| configuration | string |   |
+
+**Returns:** `PackResultResponse`
 
 ### `msbuild/query-properties`
 | Parameter | Type | Optional |
