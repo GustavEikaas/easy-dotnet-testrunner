@@ -43,7 +43,6 @@ public class RoslynService
 
     var typeDecl = CreateTypeDeclaration(kind, className, useFileScopedNs);
 
-
     MemberDeclarationSyntax nsDeclaration = useFileScopedNs
         ? SyntaxFactory.FileScopedNamespaceDeclaration(SyntaxFactory.ParseName(fullNamespace))
             .AddMembers(typeDecl)
