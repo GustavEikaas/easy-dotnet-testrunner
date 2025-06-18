@@ -16,8 +16,7 @@ using StreamJsonRpc;
 
 class Program
 {
-  // private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
-  private static readonly string PipeName = "EasyDotnet_65acfe1385d6431ca9097791e1d3f698";
+  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {

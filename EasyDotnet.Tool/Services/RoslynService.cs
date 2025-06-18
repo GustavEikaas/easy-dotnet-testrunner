@@ -14,7 +14,7 @@ namespace EasyDotnet.Services;
 public class RoslynService
 {
 
-  public async Task<bool> BootstrapFile(string filePath, Kind kind, bool fileScopedNsPreference, CancellationToken cancellationToken)
+  public async Task<bool> BootstrapFile(string filePath, Kind kind, bool preferFileScopedNamespace, CancellationToken cancellationToken)
   {
     var projectPath = FindCsprojFromFile(filePath);
     using var workspace = MSBuildWorkspace.Create();
@@ -31,7 +31,7 @@ public class RoslynService
     var langVersion = parseOptions?.LanguageVersion ?? LanguageVersion.CSharp9;
 
     var supportsFileScoped = langVersion >= LanguageVersion.CSharp10;
-    var useFileScopedNs = fileScopedNsPreference && supportsFileScoped;
+    var useFileScopedNs = preferFileScopedNamespace && supportsFileScoped;
 
     var relativePath = Path.GetDirectoryName(filePath)!
         .Replace(Path.GetDirectoryName(projectPath)!, "")

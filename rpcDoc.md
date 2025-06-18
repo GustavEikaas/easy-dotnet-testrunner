@@ -48,7 +48,7 @@
 |-----------|------|----------|
 | filePath | string |   |
 | kind | Kind |   |
-| fileScopedNsPreference | bool |   |
+| preferFileScopedNamespace | bool |   |
 
 **Returns:** `Task<BootstrapFileResultResponse>`
 
