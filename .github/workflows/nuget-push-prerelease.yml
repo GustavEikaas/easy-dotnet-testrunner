@@ -1,0 +1,34 @@
+name: 🚀 Publish Prerelease .NET Tool to NuGet
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionSuffix:
+        description: 'Version suffix for prerelease (e.g., alpha, beta, rc1)'
+        required: true
+        default: 'alpha'
+
+jobs:
+  publish-prerelease:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+
+      - name: Pack with prerelease suffix
+        run: |
+          dotnet pack -c Release --no-build \
+            /p:VersionSuffix=${{ github.event.inputs.versionSuffix }}
+
+      - name: Push to NuGet (ignore conflict errors)
+        run: |
+          dotnet nuget push EasyDotnet.Tool/bin/Release/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json
