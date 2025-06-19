@@ -127,37 +127,7 @@ _No parameters_
 |-----------|------|----------|
 | request | BuildRequest |   |
 
-**Returns:** `BuildResultResponse`
-
-### `msbuild/restore`
-| Parameter | Type | Optional |
-|-----------|------|----------|
-| targetPath | string |   |
-
-**Returns:** `BuildResultResponse`
-
-### `msbuild/pack`
-| Parameter | Type | Optional |
-|-----------|------|----------|
-| targetPath | string |   |
-| configuration | string |   |
-
-**Returns:** `PackResultResponse`
-
-### `msbuild/query-properties`
-| Parameter | Type | Optional |
-|-----------|------|----------|
-| request | QueryProjectPropertiesRequest |   |
-
-**Returns:** `DotnetProjectPropertiesResponse`
-
-### `msbuild/add-package-reference`
-| Parameter | Type | Optional |
-|-----------|------|----------|
-| targetPath | string |   |
-| packageName | string |   |
-
-**Returns:** `Task`
+**Returns:** `Task<BuildResultResponse>`
 
 ---
 
