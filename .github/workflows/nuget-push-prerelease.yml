@@ -31,7 +31,6 @@ jobs:
         id: get_version
         run: |
           VERSION=$(dotnet msbuild ./EasyDotnet.Tool/EasyDotnet.csproj -getProperty:Version)
-          echo "Resolved version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Pack with prerelease suffix
@@ -39,11 +38,8 @@ jobs:
           dotnet pack -c Release --no-build \
             -p:PackageVersion=${{ steps.get_version.outputs.version }}-${{ github.event.inputs.versionSuffix }}
 
-      - name: debug
-        run: ls ./EasyDotnet.Tool/bin/Release
-
-      # - name: Push to NuGet (ignore conflict errors)
-      #   run: |
-      #     dotnet nuget push EasyDotnet.Tool/bin/Release/EasyDotnet.(version).nupkg \
-      #       --api-key ${{ secrets.NUGET_API_KEY }} \
-      #       --source https://api.nuget.org/v3/index.json
+      - name: Push to NuGet (ignore conflict errors)
+        run: |
+          dotnet nuget push EasyDotnet.Tool/bin/Release/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json
