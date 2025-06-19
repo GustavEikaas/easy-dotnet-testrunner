@@ -11,13 +11,13 @@ public class MsBuildService
 {
 
   public async Task<bool> RequestBuildAsync(string targetPath, string configuration, CancellationToken cancellationToken = default)
-    {
-        string args = $"build \"{targetPath}\" -c {configuration}";
+  {
+    var args = $"build \"{targetPath}\" -c {configuration}";
 
-        var result = await RunDotNetCommandAsync(args, cancellationToken);
+    var result = await RunDotNetCommandAsync(args, cancellationToken);
 
-        return result.Success;
-    }
+    return result.Success;
+  }
 
 
   private async Task<CommandResult> RunDotNetCommandAsync(string arguments, CancellationToken cancellationToken)
