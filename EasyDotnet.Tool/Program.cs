@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -16,7 +17,8 @@ using StreamJsonRpc;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
+  // private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
+  private static readonly string PipeName = "EasyDotnet_c39f9ef7cdc647a9a5f7aba07ce8706f";
 
   public static async Task<int> Main(string[] args)
   {
@@ -82,6 +84,7 @@ class Program
     var jsonRpc = new JsonRpc(handler);
     var provider = DiModules.BuildServiceProvider(jsonRpc);
 
+
     AssemblyScanner.GetControllerTypes().ForEach(x =>
     {
       try
@@ -94,12 +97,12 @@ class Program
         Console.Error.WriteLine($"Failed to add RPC target for {x.FullName}: {ex.Message}");
       }
     });
-    // if (true == true)
-    // {
-    //   var ts = jsonRpc.TraceSource;
-    //   ts.Switch.Level = SourceLevels.Verbose;
-    //   ts.Listeners.Add(new ConsoleTraceListener());
-    // }
+    if (true == true)
+    {
+      var ts = jsonRpc.TraceSource;
+      ts.Switch.Level = SourceLevels.Verbose;
+      ts.Listeners.Add(new ConsoleTraceListener());
+    }
     jsonRpc.StartListening();
     Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
     await jsonRpc.Completion;
