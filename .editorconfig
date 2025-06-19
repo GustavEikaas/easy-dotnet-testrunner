@@ -78,6 +78,10 @@ dotnet_remove_unnecessary_suppression_exclusions = none
 
 #### C# Coding Conventions ####
 [*.cs]
+
+# Unused variables - treat as error
+dotnet_diagnostic.CS0168.severity = error
+dotnet_diagnostic.CS0219.severity = error
 max_line_length = 240
 
 # var preferences
