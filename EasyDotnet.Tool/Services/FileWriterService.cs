@@ -68,22 +68,6 @@ public class OutFileWriterService
     }
   }
 
-  public void WriteBuildResult(List<BuildMessage> messages, string outFile)
-  {
-    using var writer = new StreamWriter(outFile, false);
-
-    if (messages.Count == 0)
-    {
-      writer.WriteLine("[]");
-    }
-    else
-    {
-      messages.ToList().ForEach(x =>
-          writer.WriteLine(JsonSerializer.Serialize(x, SerializerOptions).Replace("\n", "").Replace("\r", ""))
-        );
-    }
-  }
-
   public void WriteOutdatedDependencies(List<OutdatedDependencyInfoResponse> packages, string outFile)
   {
     using var writer = new StreamWriter(outFile, false);

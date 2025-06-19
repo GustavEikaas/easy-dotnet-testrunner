@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 using EasyDotnet;
 using EasyDotnet.Utils;
-using Microsoft.Build.Locator;
 using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json.Serialization;
@@ -20,7 +19,6 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
-    BootstrapMsBuild();
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();
@@ -48,15 +46,6 @@ class Program
 
     return 0;
   }
-
-  private static void BootstrapMsBuild()
-  {
-    if (!MSBuildLocator.IsRegistered)
-    {
-      MSBuildLocator.RegisterDefaults();
-    }
-  }
-
 
   private static async Task StartServerAsync()
   {
