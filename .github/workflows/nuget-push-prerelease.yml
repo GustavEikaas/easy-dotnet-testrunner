@@ -30,7 +30,7 @@ jobs:
       - name: Resolve version
         id: get_version
         run: |
-          VERSION=$(dotnet msbuild -nologo -verbosity:quiet -target:GetVersion -property:TargetPath=EasyDotnet.Tool/EasyDotnet.Tool.csproj -getProperty:Version)
+          VERSION=$(dotnet msbuild ./EasyDotnet.Tool/EasyDotnet.csproj -getProperty:Version)
           echo "Resolved version: $VERSION"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
