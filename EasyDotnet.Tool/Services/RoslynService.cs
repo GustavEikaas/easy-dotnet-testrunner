@@ -19,7 +19,6 @@ public class RoslynService
     var projectPath = FindCsprojFromFile(filePath);
     using var workspace = MSBuildWorkspace.Create();
     var project = await workspace.OpenProjectAsync(projectPath, cancellationToken: cancellationToken);
-    var compilation = await project.GetCompilationAsync(cancellationToken);
 
     var rootNamespace = project.DefaultNamespace;
     if (string.IsNullOrEmpty(rootNamespace))
