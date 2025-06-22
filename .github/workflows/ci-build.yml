@@ -22,6 +22,9 @@ jobs:
       - name: Build
         run: dotnet build 
 
+      - name: Test
+        run: dotnet test 
+
       - name: Generate RPC docs
         run: dotnet run --project ./EasyDotnet.Tool/EasyDotnet.csproj --generate-rpc-docs-md
 
