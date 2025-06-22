@@ -38,7 +38,7 @@ public class RoslynService
     var nsSuffix = relativePath.Replace(Path.DirectorySeparatorChar, '.');
     var fullNamespace = string.IsNullOrEmpty(nsSuffix) ? rootNamespace : $"{rootNamespace}.{nsSuffix}";
 
-    var className = Path.GetFileNameWithoutExtension(filePath);
+    var className = Path.GetFileNameWithoutExtension(filePath).Split(".").ElementAt(0)!;
 
     var typeDecl = CreateTypeDeclaration(kind, className, useFileScopedNs);
 
