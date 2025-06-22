@@ -24,7 +24,7 @@ public class InitializeTests
   {
     using var server = RpcTestServerInstantiator.GetUninitializedStreamServer();
 
-    var res = await server.InvokeWithParameterObjectAsync<TestInitializeResponse>("initialize", new List<TestInitializeRequest>() { new(new TestClientInfo("test", "1.0.0"), new TestProjectInfo("C:/Users")) });
+    var res = await server.InvokeWithParameterObjectAsync<TestInitializeResponse>("initialize", new List<TestInitializeRequest>() { new(new TestClientInfo("test", "1.0.0"), new TestProjectInfo(Path.GetTempPath())) });
 
     Assert.NotNull(res);
     Assert.NotNull(res.ServerInfo);

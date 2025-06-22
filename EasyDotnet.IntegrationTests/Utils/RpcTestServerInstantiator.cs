@@ -53,7 +53,7 @@ public static class RpcTestServerInstantiator
   public static async Task<JsonRpc> GetInitializedStreamServer()
   {
     var server = GetUninitializedStreamServer();
-    await server.InvokeWithParameterObjectAsync<TestInitializeResponse>("initialize", new List<TestInitializeRequest>() { new(new TestClientInfo("test", "1.0.0"), new TestProjectInfo("C:/Users")) });
+    await server.InvokeWithParameterObjectAsync<TestInitializeResponse>("initialize", new List<TestInitializeRequest>() { new(new TestClientInfo("test", "1.0.0"), new TestProjectInfo(Path.GetTempPath())) });
     return server;
   }
 
