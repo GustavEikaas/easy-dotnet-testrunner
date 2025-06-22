@@ -1,5 +1,6 @@
 using System.IO.Abstractions;
 using DotNetOutdated.Core.Services;
+using EasyDotnet.Controllers.MsBuild;
 using EasyDotnet.Services;
 using EasyDotnet.Utils;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ public static class DiModules
     services.AddTransient<OutdatedService>();
     services.AddSingleton<IFileSystem, FileSystem>();
     services.AddSingleton<RoslynService>();
+    services.AddSingleton<IBuildClientManager, BuildClientManager>();
 
     //Dotnet oudated
     services.AddSingleton<IProjectAnalysisService, ProjectAnalysisService>();

@@ -15,10 +15,11 @@ using StreamJsonRpc;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
+  private static readonly string PipeName = "EasyDotnet_e5422cd1781a40588ddf2642de873247";
 
   public static async Task<int> Main(string[] args)
   {
+    HostDirectoryUtil.HostDirectory = Directory.GetCurrentDirectory();
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();

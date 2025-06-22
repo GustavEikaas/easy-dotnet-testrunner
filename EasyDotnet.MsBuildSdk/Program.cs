@@ -1,77 +1,53 @@
 ﻿using Microsoft.Build.Locator;
-using Microsoft.Build.Evaluation;
 using StreamJsonRpc;
-using Microsoft.Build.Execution;
-using Microsoft.Build.Framework;
+using System.IO.Pipes;
+using Newtonsoft.Json.Serialization;
+using EasyDotnet.MsBuildSdk.Controllers;
 
-namespace BuildServer
+namespace EasyDotnet.MsBuildSdk;
+
+class Program
 {
-  class Program
+  static void BootstrapMsBuild()
   {
-    static async Task Main(string[] args)
+    MSBuildLocator.AllowQueryAllRuntimeVersions = true;
+    MSBuildLocator.RegisterDefaults();
+  }
+
+  static async Task Main(string[] args)
+  {
+    BootstrapMsBuild();
+    var pipe = args[0];
+    await StartServerAsync(pipe);
+  }
+
+  private static async Task StartServerAsync(string pipeName)
+  {
+    var clientId = 0;
+    while (true)
     {
-      // Register MSBuild
-      MSBuildLocator.RegisterDefaults();
-
-      // Set up JSON-RPC over stdin/stdout
-      var rpc = new JsonRpc(Console.OpenStandardOutput(), Console.OpenStandardInput(), new BuildHandler());
-      rpc.StartListening();
-
-      Console.Error.WriteLine("BuildServer started. Listening for RPC...");
-      await Task.Delay(-1); // Keep app alive
+      var stream = new NamedPipeServerStream(pipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+      Console.WriteLine($"Named pipe server started: {pipeName}");
+      await stream.WaitForConnectionAsync();
+      _ = RespondToRpcRequestsAsync(stream, ++clientId);
     }
   }
 
-  public class BuildHandler
+  private static async Task RespondToRpcRequestsAsync(Stream stream, int clientId)
   {
-    [JsonRpcMethod("build")]
-    public async Task<string> BuildAsync(string projectPath)
+    var jsonMessageFormatter = new JsonMessageFormatter();
+    jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
     {
-      try
-      {
-        var project = new Project(projectPath);
-        var success = project.Build();
-        return success ? "Build succeeded." : "Build failed.";
-      }
-      catch (Exception ex)
-      {
-        return $"Build error: {ex.Message}";
-      }
-    }
+      NamingStrategy = new CamelCaseNamingStrategy(),
+    };
 
-    public BuildResult RequestBuild(string targetPath, string configuration)
-    {
-      var properties = new Dictionary<string, string?> { { "Configuration", configuration } };
+    var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
+    var jsonRpc = new JsonRpc(handler);
+    jsonRpc.AddLocalRpcTarget(new MsbuildController());
 
-      using var pc = new ProjectCollection();
-      var buildRequest = new BuildRequestData(targetPath, properties, null, ["Restore", "Build"], null);
-      var logger = new InMemoryLogger();
-
-      var parameters = new BuildParameters(pc) { Loggers = [logger] };
-
-      var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
-
-      return new BuildResult(Success: result.OverallResult == BuildResultCode.Success, result, logger.Messages);
-    }
-
-    public record BuildResult(bool Success, Microsoft.Build.Execution.BuildResult Result, List<BuildMessage> Messages);
-
-    public sealed record BuildMessage(string Type, string FilePath, int LineNumber, int ColumnNumber, string Code, string? Message);
-
-    public class InMemoryLogger : ILogger
-    {
-      public List<BuildMessage> Messages { get; } = [];
-
-      public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
-      public string? Parameters { get; set; }
-
-      public void Initialize(IEventSource eventSource)
-      {
-        eventSource.ErrorRaised += (sender, args) => Messages.Add(new BuildMessage("error", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
-        eventSource.WarningRaised += (sender, args) => Messages.Add(new BuildMessage("warning", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
-      }
-
-      public void Shutdown() { }
-    }
+    jsonRpc.StartListening();
+    Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
+    await jsonRpc.Completion;
+    await Console.Error.WriteLineAsync($"Connection #{clientId} terminated.");
   }
 }

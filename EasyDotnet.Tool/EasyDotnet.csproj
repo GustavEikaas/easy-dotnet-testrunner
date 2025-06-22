@@ -14,6 +14,19 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <MsBuildSdkOutputDir>..\EasyDotnet.MsBuildSdk\bin\Release\net9.0\</MsBuildSdkOutputDir>
+  </PropertyGroup>
+
+  <Target Name="CopyMsBuildSdkOutput" AfterTargets="Build">
+    <ItemGroup>
+      <MsBuildSdkFiles Include="$(MsBuildSdkOutputDir)**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(MsBuildSdkFiles)"
+          DestinationFolder="$(OutputPath)MsBuildSdk\%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />
     <None Include="..\README.md" Pack="true" PackagePath="" />
@@ -33,5 +46,8 @@
     <PackageReference Include="NuGet.Configuration" Version="6.14.0" />
     <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
     <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EasyDotnet.MsBuild.Contracts\EasyDotnet.MsBuild.Contracts.csproj" />
   </ItemGroup>
 </Project>

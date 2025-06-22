@@ -1,20 +1,134 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using EasyDotnet.MsBuild.Contracts;
 using EasyDotnet.Services;
+using EasyDotnet.Utils;
+using Newtonsoft.Json.Serialization;
 using StreamJsonRpc;
 
 namespace EasyDotnet.Controllers.MsBuild;
 
-public class MsBuildController(ClientService clientService, MsBuildService msBuild, OutFileWriterService outFileWriterService) : BaseController
+public class MsBuildController(ClientService clientService, MsBuildService msBuild, OutFileWriterService outFileWriterService, IBuildClientManager manager) : BaseController
 {
   [JsonRpcMethod("msbuild/build")]
   public async Task<BuildResultResponse> Build(BuildRequest request)
   {
-    clientService.ThrowIfNotInitialized();
+    var x = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
+    var result = await x.BuildAsync(request.TargetPath, request.ConfigurationOrDefault);
+    return new(result.Success);
+  }
+}
 
-    var buildResult = await msBuild.RequestBuildAsync(request.TargetPath, request.ConfigurationOrDefault);
 
-    return new BuildResultResponse(buildResult);
+public class BuildClient(string pipeName)
+{
+  private JsonRpc? _rpc;
+  private Process? _serverProcess;
+  private Task? _connectTask;
+  private readonly object _connectLock = new();
+
+  public Task ConnectAsync(bool ensureServerStarted = true)
+  {
+    lock (_connectLock)
+    {
+      _connectTask ??= ConnectInternalAsync(ensureServerStarted);
+      return _connectTask;
+    }
   }
 
+  private async Task ConnectInternalAsync(bool ensureServerStarted)
+  {
+    if (ensureServerStarted)
+    {
+      _serverProcess = BuildServerStarter.StartBuildServer(pipeName);
+      await Task.Delay(1000);
+    }
 
+    var stream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+    await stream.ConnectAsync();
+
+    var jsonMessageFormatter = new JsonMessageFormatter
+    {
+      JsonSerializer = { ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() } }
+    };
+
+    var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
+    _rpc = new JsonRpc(handler);
+    _rpc.StartListening();
+  }
+
+  public async Task<BuildResult> BuildAsync(string targetPath, string configuration)
+  {
+    if (_rpc == null)
+      throw new InvalidOperationException("BuildClient not connected.");
+
+    var request = new { TargetPath = targetPath, Configuration = configuration };
+    return await _rpc.InvokeWithParameterObjectAsync<BuildResult>("msbuild/build", request);
+  }
+
+  public void StopServer()
+  {
+    if (_serverProcess != null && !_serverProcess.HasExited)
+    {
+      _serverProcess.Kill(true);
+      _serverProcess.Dispose();
+    }
+  }
+}
+
+public static class BuildServerStarter
+{
+  public static Process StartBuildServer(string pipeName)
+  {
+    // string exePath;
+    // var exePath = "C:/Users/Gustav/repo/easy-dotnet-server/EasyDotnet.MsBuildSdk/bin/Debug/net9.0/EasyDotnet.MsBuildSdk.exe";
+    var dir = HostDirectoryUtil.HostDirectory;
+
+
+#if DEBUG
+    var exePath = Path.Combine(
+        dir,
+        "EasyDotnet.MsBuildSdk", "bin", "Debug", "net9.0", GetExecutable("EasyDotnet.MsBuildSdk"));
+#else
+    var exePath = Path.Combine(dir, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));
+#endif
+    // string? exePath;
+    // if (Debugger.IsAttached)
+    // {
+    //   exePath = Path.Combine(
+    //     dir, // <-- use captured original directory here
+    //     "..", "..", "..", "..", "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", GetExecutable("EasyDotnet.MsBuildSdk"));
+    // }
+    // else
+    // {
+    //   exePath = Path.Combine(dir, GetExecutable("EasyDotnet.MsBuildSdk"));
+    // }
+    Console.WriteLine(exePath);
+
+    if (!File.Exists(exePath))
+      throw new FileNotFoundException("Build server executable not found.", exePath);
+
+    var startInfo = new ProcessStartInfo
+    {
+      FileName = exePath,
+      Arguments = pipeName,
+      UseShellExecute = false,
+      RedirectStandardOutput = true,
+      RedirectStandardError = true,
+      CreateNoWindow = true
+    };
+
+    var process = new Process { StartInfo = startInfo };
+    process.Start();
+
+    Console.WriteLine($"Started BuildServer from: {exePath}");
+
+    return process;
+  }
+
+  private static string GetExecutable(string name) => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{name}.exe" : name;
 }
