@@ -7,14 +7,11 @@ namespace EasyDotnet.IntegrationTests.Utils;
 
 public static class RpcTestServerInstantiator
 {
-  public static ServiceProvider GetFakeServiceProvider(JsonRpc server)
-  {
+  public static ServiceProvider GetFakeServiceProvider(JsonRpc server) =>
     // var serviceCollection = new ServiceCollection();
     //
     // return serviceCollection.BuildServiceProvider();
-    return DiModules.BuildServiceProvider(server);
-
-  }
+    DiModules.BuildServiceProvider(server);
 
   /// <summary>
   /// Creates and starts a new JSON-RPC server using an in-memory full-duplex stream pair, without sending an initial <c>initialize</c> request.
