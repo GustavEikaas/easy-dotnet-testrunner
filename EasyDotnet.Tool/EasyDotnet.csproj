@@ -6,7 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
+    <Version>1.0.7</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
@@ -15,17 +15,21 @@
     <IncludePackageReadmeFile>true</IncludePackageReadmeFile>
   </PropertyGroup>
   <PropertyGroup>
-    <MsBuildSdkOutputDir>..\EasyDotnet.MsBuildSdk\bin\Release\net9.0\</MsBuildSdkOutputDir>
+    <MsBuildSdkSource>..\EasyDotnet.MsBuildSdk\bin\Release\net9.0\**\*</MsBuildSdkSource>
+    <MsBuildSdkTarget>$(OutputPath)MsBuildSdk\</MsBuildSdkTarget>
   </PropertyGroup>
 
-  <Target Name="CopyMsBuildSdkOutput" AfterTargets="Build">
+  <Target Name="CopyAndIncludeSdkFiles" AfterTargets="Build">
     <ItemGroup>
-      <MsBuildSdkFiles Include="$(MsBuildSdkOutputDir)**\*.*" />
+      <SdkFiles Include="$(MsBuildSdkSource)" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(MsBuildSdkFiles)"
-          DestinationFolder="$(OutputPath)MsBuildSdk\%(RecursiveDir)"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(SdkFiles)" DestinationFolder="$(MsBuildSdkTarget)" SkipUnchangedFiles="true" />
+
+    <!-- Register copied files for NuGet packing -->
+    <ItemGroup>
+      <None Include="$(MsBuildSdkTarget)**\*.*" Pack="true" PackagePath="tools/net8.0/any/MsBuildSdk" />
+    </ItemGroup>
   </Target>
   <ItemGroup>
     <None Include="..\LICENSE" Pack="true" PackagePath="" />

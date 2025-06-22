@@ -94,7 +94,8 @@ public static class BuildServerStarter
         dir,
         "EasyDotnet.MsBuildSdk", "bin", "Debug", "net9.0", GetExecutable("EasyDotnet.MsBuildSdk"));
 #else
-    var exePath = Path.Combine(dir, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));
+    var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+    var exePath = Path.Combine(exeHost, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));
 #endif
     // string? exePath;
     // if (Debugger.IsAttached)
