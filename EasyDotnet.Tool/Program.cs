@@ -59,39 +59,11 @@ class Program
     }
   }
 
-  private static async Task RespondToRpcRequestsAsync(NamedPipeServerStream stream, int clientId)
+  private static async Task RespondToRpcRequestsAsync(Stream stream, int clientId)
   {
-    var jsonMessageFormatter = new JsonMessageFormatter();
-    jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
-    {
-      NamingStrategy = new CamelCaseNamingStrategy(),
-    };
-
-    var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
-    var jsonRpc = new JsonRpc(handler);
-    var provider = DiModules.BuildServiceProvider(jsonRpc);
-
-    AssemblyScanner.GetControllerTypes().ForEach(x =>
-    {
-      try
-      {
-        var target = provider.GetRequiredService(x);
-        jsonRpc.AddLocalRpcTarget(target);
-      }
-      catch (Exception ex)
-      {
-        Console.Error.WriteLine($"Failed to add RPC target for {x.FullName}: {ex.Message}");
-      }
-    });
-    // if (true == true)
-    // {
-    //   var ts = jsonRpc.TraceSource;
-    //   ts.Switch.Level = SourceLevels.Verbose;
-    //   ts.Listeners.Add(new ConsoleTraceListener());
-    // }
-    jsonRpc.StartListening();
-    Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
-    await jsonRpc.Completion;
+    var rpc = JsonRpcServerBuilder.Build(stream, stream);
+    rpc.StartListening();
+    await rpc.Completion;
     await Console.Error.WriteLineAsync($"Connection #{clientId} terminated.");
   }
 }

@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EasyDotnet.Tool", "EasyDotn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyDotnet", "EasyDotnet.Tool\EasyDotnet.csproj", "{88F10753-C6CE-42BD-BA96-02D760DF5635}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyDotnet.IntegrationTests", "EasyDotnet.IntegrationTests\EasyDotnet.IntegrationTests.csproj", "{B4204153-D501-42D2-BD80-A9644FE45825}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,18 @@ Global
 		{88F10753-C6CE-42BD-BA96-02D760DF5635}.Release|x64.Build.0 = Release|Any CPU
 		{88F10753-C6CE-42BD-BA96-02D760DF5635}.Release|x86.ActiveCfg = Release|Any CPU
 		{88F10753-C6CE-42BD-BA96-02D760DF5635}.Release|x86.Build.0 = Release|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Debug|x64.Build.0 = Debug|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Debug|x86.Build.0 = Debug|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Release|x64.ActiveCfg = Release|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Release|x64.Build.0 = Release|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Release|x86.ActiveCfg = Release|Any CPU
+		{B4204153-D501-42D2-BD80-A9644FE45825}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

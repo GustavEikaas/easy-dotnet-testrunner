@@ -12,7 +12,15 @@ using NuGet.Versioning;
 
 namespace EasyDotnet.Services;
 
-public class NugetService
+public interface INugetService
+{
+  Task<IEnumerable<NuGetVersion>> GetPackageVersionsAsync(string packageId, CancellationToken cancellationToken, bool includePrerelease = false, List<string>? sourceNames = null);
+  List<PackageSource> GetSources();
+  Task<bool> PushPackageAsync(List<string> packages, string sourceUrl, string? apiKey);
+  Task<Dictionary<string, IEnumerable<IPackageSearchMetadata>>> SearchAllSourcesByNameAsync(string searchTerm, CancellationToken cancellationToken, int take = 10, bool includePrerelease = false, List<string>? sourceNames = null);
+}
+
+public class NugetService : INugetService
 {
 
   public List<PackageSource> GetSources()

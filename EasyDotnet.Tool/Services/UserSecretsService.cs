@@ -7,7 +7,12 @@ namespace EasyDotnet.Services;
 
 public sealed record ProjectUserSecret(string Id, string FilePath);
 
-public class UserSecretsService
+public interface IUserSecretsService
+{
+  ProjectUserSecret AddUserSecretsId(string projectPath);
+}
+
+public class UserSecretsService : IUserSecretsService
 {
 
   private readonly string _basePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "UserSecrets");

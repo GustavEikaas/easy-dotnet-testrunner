@@ -9,7 +9,15 @@ using EasyDotnet.Types;
 
 namespace EasyDotnet.Services;
 
-public class OutFileWriterService
+public interface IOutFileWriterService
+{
+  void WriteDiscoveredTests(List<DiscoveredTest> testList, string outFile);
+  void WriteNugetResults(List<NugetPackageMetadata> packages, string outFile);
+  void WriteOutdatedDependencies(List<OutdatedDependencyInfoResponse> packages, string outFile);
+  void WriteTestRunResults(List<TestRunResult> results, string outFile);
+}
+
+public class OutFileWriterService : IOutFileWriterService
 {
   private static readonly JsonSerializerOptions SerializerOptions = new()
   {

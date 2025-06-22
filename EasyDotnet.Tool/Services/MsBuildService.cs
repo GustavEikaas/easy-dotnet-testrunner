@@ -1,13 +1,15 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace EasyDotnet.Services;
 
-public class MsBuildService
+public interface IMsBuildService
+{
+  Task<bool> RequestBuildAsync(string targetPath, string configuration, CancellationToken cancellationToken = default);
+}
+
+public class MsBuildService : IMsBuildService
 {
 
   public async Task<bool> RequestBuildAsync(string targetPath, string configuration, CancellationToken cancellationToken = default)
