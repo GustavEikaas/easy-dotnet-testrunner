@@ -4,13 +4,7 @@ using EasyDotnet.VSTest;
 
 namespace EasyDotnet.Services;
 
-public interface IVsTestService
-{
-  void RunDiscover(string vsTestPath, DiscoverProjectRequest[] projects);
-  void RunTests(string vsTestPath, string dllPath, Guid[] testIds, string outFile);
-}
-
-public class VsTestService(OutFileWriterService outFileWriter) : IVsTestService
+public class VsTestService(OutFileWriterService outFileWriter)
 {
   public void RunDiscover(string vsTestPath, DiscoverProjectRequest[] projects)
   {

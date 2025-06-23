@@ -8,12 +8,7 @@ using NuGet.Versioning;
 
 namespace EasyDotnet.Services;
 
-public interface IOutdatedService
-{
-  Task<List<OutdatedService.DependencyInfo>> AnalyzeProjectDependenciesAsync(string projectPath, bool includeTransitive = false, int transitiveDepth = 1, bool includeUpToDate = false, PrereleaseReporting prereleaseReporting = PrereleaseReporting.Auto, VersionLock versionLock = VersionLock.None, string runtime = "");
-}
-
-public class OutdatedService(IProjectAnalysisService projectAnalysisService, INuGetPackageResolutionService nugetService) : IOutdatedService
+public class OutdatedService(IProjectAnalysisService projectAnalysisService, INuGetPackageResolutionService nugetService)
 {
 
   public async Task<List<DependencyInfo>> AnalyzeProjectDependenciesAsync(

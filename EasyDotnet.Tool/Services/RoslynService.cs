@@ -11,12 +11,7 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 namespace EasyDotnet.Services;
 
-public interface IRoslynService
-{
-  Task<bool> BootstrapFile(string filePath, Kind kind, bool preferFileScopedNamespace, CancellationToken cancellationToken);
-}
-
-public class RoslynService : IRoslynService
+public class RoslynService
 {
 
   public async Task<bool> BootstrapFile(string filePath, Kind kind, bool preferFileScopedNamespace, CancellationToken cancellationToken)

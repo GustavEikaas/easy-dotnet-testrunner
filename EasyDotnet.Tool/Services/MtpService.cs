@@ -8,13 +8,7 @@ using EasyDotnet.MTP.RPC;
 
 namespace EasyDotnet.Services;
 
-public interface IMtpService
-{
-  Task RunDiscoverAsync(string testExecutablePath, string outFile, CancellationToken token);
-  Task RunTestsAsync(string testExecutablePath, RunRequestNode[] filter, string outFile, CancellationToken token);
-}
-
-public class MtpService(OutFileWriterService outFileWriterService) : IMtpService
+public class MtpService(OutFileWriterService outFileWriterService)
 {
   public async Task RunDiscoverAsync(string testExecutablePath, string outFile, CancellationToken token)
   {

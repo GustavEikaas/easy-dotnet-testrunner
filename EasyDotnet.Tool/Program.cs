@@ -6,12 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using EasyDotnet;
-using EasyDotnet.Utils;
-using Microsoft.Extensions.DependencyInjection;
-
-using Newtonsoft.Json.Serialization;
-
-using StreamJsonRpc;
 
 class Program
 {
