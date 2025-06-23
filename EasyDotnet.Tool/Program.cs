@@ -13,6 +13,7 @@ class Program
 
   public static async Task<int> Main(string[] args)
   {
+    Console.WriteLine(Environment.ProcessId);
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();
