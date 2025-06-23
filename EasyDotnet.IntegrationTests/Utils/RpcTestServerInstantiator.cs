@@ -1,5 +1,4 @@
 using EasyDotnet.IntegrationTests.Initialize;
-using Microsoft.Extensions.DependencyInjection;
 using Nerdbank.Streams;
 using StreamJsonRpc;
 
@@ -7,8 +6,6 @@ namespace EasyDotnet.IntegrationTests.Utils;
 
 public static class RpcTestServerInstantiator
 {
-  public static ServiceProvider GetFakeServiceProvider(JsonRpc server) => DiModules.BuildServiceProvider(server);
-
   /// <summary>
   /// Creates and starts a new JSON-RPC server using an in-memory full-duplex stream pair, without sending an initial <c>initialize</c> request.
   /// </summary>
@@ -23,7 +20,7 @@ public static class RpcTestServerInstantiator
   public static JsonRpc GetUninitializedStreamServer()
   {
     var (stream1, stream2) = FullDuplexStream.CreatePair();
-    var server = JsonRpcServerBuilder.Build(stream1, stream2, GetFakeServiceProvider);
+    var server = JsonRpcServerBuilder.Build(stream1, stream2, DiModules.BuildServiceProvider);
     server.StartListening();
     return server;
   }
