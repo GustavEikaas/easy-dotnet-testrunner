@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using EasyDotnet;
+using EasyDotnet.Utils;
 
 class Program
 {
