@@ -48,14 +48,10 @@ internal class MtpServer
   }
 
   [JsonRpcMethod("telemetry/update", UseSingleObjectParameterDeserialization = true)]
-  public Task TelemetryAsync(TelemetryPayload telemetry) =>
-    // Console.WriteLine("telemetry/update");
-    Task.CompletedTask;
+  public Task TelemetryAsync(TelemetryPayload telemetry) => Task.CompletedTask;
 
   [JsonRpcMethod("client/log")]
-  public Task LogAsync(LogLevel level, string message) =>
-    // Console.WriteLine("client/log");
-    Task.CompletedTask;
+  public Task LogAsync(LogLevel level, string message) => Task.CompletedTask;
 }
 
 public sealed record AttachDebuggerInfo([property: JsonProperty("processId")] int ProcessId);
