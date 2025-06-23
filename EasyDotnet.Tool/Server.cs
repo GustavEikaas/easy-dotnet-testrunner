@@ -31,29 +31,14 @@ public static class JsonRpcServerBuilder
             }}
   };
 
-  private static void RegisterControllers(JsonRpc jsonRpc, IServiceProvider provider)
-  {
-    foreach (var controllerType in AssemblyScanner.GetControllerTypes())
-    {
-      try
-      {
-        var instance = provider.GetRequiredService(controllerType);
-        jsonRpc.AddLocalRpcTarget(instance);
-      }
-      catch (Exception ex)
-      {
-        Console.Error.WriteLine($"Failed to add RPC target for {controllerType.FullName}: {ex.Message}");
-      }
-    }
-  }
+  private static void RegisterControllers(JsonRpc jsonRpc, IServiceProvider provider) => AssemblyScanner.GetControllerTypes().ForEach(x => jsonRpc.AddLocalRpcTarget(provider.GetRequiredService(x)));
 
   private static void EnableTracingIfNeeded(JsonRpc jsonRpc)
   {
-    if (Environment.GetEnvironmentVariable("ENABLE_JSONRPC_TRACE") == "1")
-    {
-      var ts = jsonRpc.TraceSource;
-      ts.Switch.Level = SourceLevels.Verbose;
-      ts.Listeners.Add(new ConsoleTraceListener());
-    }
+#if DEBUG
+    var ts = jsonRpc.TraceSource;
+    ts.Switch.Level = SourceLevels.Verbose;
+    ts.Listeners.Add(new ConsoleTraceListener());
+#endif
   }
 }
