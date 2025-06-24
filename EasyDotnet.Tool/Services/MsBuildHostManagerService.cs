@@ -130,6 +130,7 @@ public static class BuildServerStarter
     {
       throw new FileNotFoundException("Build server executable not found.", exePath);
     }
+    Console.WriteLine(exePath);
 
 
     ProcessStartInfo startInfo;
@@ -208,7 +209,7 @@ public static class BuildServerStarter
 #if DEBUG
       BuildClientType.Framework => Path.Combine(dir, "EasyDotnet.MsBuildFramework", "bin", "Debug", "net472", "EasyDotnet.MsBuildFramework.exe"),
 #else
-      BuildClientType.Framework => Path.Combine(exeHost,  "EasyDotnet.MsBuildFramework", "EasyDotnet.MsBuildFramework.exe"),
+      BuildClientType.Framework => Path.Combine(exeHost,  "MsBuildFramework", "EasyDotnet.MsBuildFramework.exe"),
 #endif
       _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
     };
