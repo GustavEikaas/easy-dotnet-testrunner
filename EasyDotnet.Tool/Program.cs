@@ -15,7 +15,6 @@ class Program
   public static async Task<int> Main(string[] args)
   {
     HostDirectoryUtil.HostDirectory = Directory.GetCurrentDirectory();
-    Console.WriteLine(HostDirectoryUtil.HostDirectory);
     if (args.Contains("-v"))
     {
       var assembly = Assembly.GetExecutingAssembly();
