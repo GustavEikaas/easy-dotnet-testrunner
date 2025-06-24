@@ -140,7 +140,9 @@ public static class BuildServerStarter
         "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", GetExecutable("EasyDotnet.MsBuildSdk"));
 #else
     var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+    Console.WriteLine(exeHost);
     var exePath = Path.Combine(exeHost, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));
+    Console.WriteLine(exePath);
 #endif
 
     if (!File.Exists(exePath))
