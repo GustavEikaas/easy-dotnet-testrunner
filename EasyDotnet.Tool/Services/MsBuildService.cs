@@ -5,7 +5,7 @@ using EasyDotnet.MsBuild.Contracts;
 
 namespace EasyDotnet.Services;
 
-public class MsBuildService(IBuildClientManager manager)
+public class MsBuildService(IMsBuildHostManager manager)
 {
   public async Task<BuildResult> RequestBuildAsync(string targetPath, string configuration, CancellationToken cancellationToken = default)
   {

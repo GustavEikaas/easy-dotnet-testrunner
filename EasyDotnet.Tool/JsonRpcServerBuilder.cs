@@ -21,7 +21,7 @@ public static class JsonRpcServerBuilder
     RegisterControllers(jsonRpc, sp);
     EnableTracingIfNeeded(jsonRpc);
 
-    jsonRpc.Completion.ContinueWith(x => sp.GetRequiredService<IBuildClientManager>().StopAll());
+    jsonRpc.Completion.ContinueWith(x => sp.GetRequiredService<IMsBuildHostManager>().StopAll());
 
     return jsonRpc;
   }

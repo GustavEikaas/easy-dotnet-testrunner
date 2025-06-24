@@ -17,28 +17,28 @@ public enum BuildClientType
   Framework
 }
 
-public interface IBuildClientManager
+public interface IMsBuildHostManager
 {
-  Task<BuildClient> GetOrStartClientAsync(BuildClientType type);
+  Task<MsBuildHost> GetOrStartClientAsync(BuildClientType type);
   void StopAll();
 }
 
-public class BuildClientManager : IBuildClientManager, IDisposable
+public class MsBuildHostManager : IMsBuildHostManager, IDisposable
 {
   private const int MaxPipeNameLength = 104;
   private readonly string _sdk_Pipe = GeneratePipeName(BuildClientType.Sdk);
   private readonly string _framework_Pipe = GeneratePipeName(BuildClientType.Framework);
 
-  private readonly ConcurrentDictionary<string, BuildClient> _buildClientCache = new();
+  private readonly ConcurrentDictionary<string, MsBuildHost> _buildClientCache = new();
 
 
-  public async Task<BuildClient> GetOrStartClientAsync(BuildClientType type)
+  public async Task<MsBuildHost> GetOrStartClientAsync(BuildClientType type)
   {
     var client = _buildClientCache.AddOrUpdate(
     type == BuildClientType.Sdk ? _sdk_Pipe : _framework_Pipe,
-    key => new BuildClient(key),
+    key => new MsBuildHost(key),
     (key, existingClient) =>
-      existingClient ?? new BuildClient(key));
+      existingClient ?? new MsBuildHost(key));
 
     await client.ConnectAsync(ensureServerStarted: true);
     return client;
@@ -64,7 +64,7 @@ public class BuildClientManager : IBuildClientManager, IDisposable
   public void Dispose() => StopAll();
 }
 
-public class BuildClient(string pipeName)
+public class MsBuildHost(string pipeName)
 {
   private JsonRpc? _rpc;
   private Process? _serverProcess;
