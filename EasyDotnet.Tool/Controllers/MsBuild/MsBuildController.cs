@@ -92,10 +92,7 @@ public static class BuildServerStarter
 {
   public static Process StartBuildServer(string pipeName)
   {
-    // string exePath;
-    // var exePath = "C:/Users/Gustav/repo/easy-dotnet-server/EasyDotnet.MsBuildSdk/bin/Debug/net9.0/EasyDotnet.MsBuildSdk.exe";
     var dir = HostDirectoryUtil.HostDirectory;
-
 
 #if DEBUG
     var exePath = Path.Combine(
@@ -105,21 +102,11 @@ public static class BuildServerStarter
     var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
     var exePath = Path.Combine(exeHost, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));
 #endif
-    // string? exePath;
-    // if (Debugger.IsAttached)
-    // {
-    //   exePath = Path.Combine(
-    //     dir, // <-- use captured original directory here
-    //     "..", "..", "..", "..", "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", GetExecutable("EasyDotnet.MsBuildSdk"));
-    // }
-    // else
-    // {
-    //   exePath = Path.Combine(dir, GetExecutable("EasyDotnet.MsBuildSdk"));
-    // }
-    Console.WriteLine(exePath);
 
     if (!File.Exists(exePath))
+    {
       throw new FileNotFoundException("Build server executable not found.", exePath);
+    }
 
     var startInfo = new ProcessStartInfo
     {
