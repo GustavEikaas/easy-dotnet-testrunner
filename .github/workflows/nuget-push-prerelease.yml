@@ -35,7 +35,7 @@ jobs:
 
       - name: Pack with prerelease suffix
         run: |
-          dotnet pack -c Release --no-build \
+          dotnet pack ./EasyDotnet.Tool \
             -p:PackageVersion=${{ steps.get_version.outputs.version }}-${{ github.event.inputs.versionSuffix }}
 
       - name: Push to NuGet (ignore conflict errors)
