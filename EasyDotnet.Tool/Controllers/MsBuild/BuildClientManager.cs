@@ -65,19 +65,13 @@ public class BuildClientManager : IBuildClientManager, IDisposable
   public void Dispose() => StopAll();
 }
 
-public class BuildClient
+public class BuildClient(string pipeName)
 {
   private JsonRpc? _rpc;
   private Process? _serverProcess;
   private Task? _connectTask;
   private readonly object _connectLock = new();
-  private readonly string _pipeName;
-
-  public BuildClient(string pipeName)
-  {
-    Console.WriteLine("SPAWNING " + pipeName);
-    _pipeName = pipeName;
-  }
+  private readonly string _pipeName = pipeName;
 
   public Task ConnectAsync(bool ensureServerStarted = true)
   {
@@ -140,9 +134,7 @@ public static class BuildServerStarter
         "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", "EasyDotnet.MsBuildSdk.dll");
 #else
     var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-    Console.WriteLine(exeHost);
     var exePath = Path.Combine(exeHost, "MsBuildSdk", "EasyDotnet.MsBuildSdk.dll");
-    Console.WriteLine(exePath);
 #endif
 
     if (!File.Exists(exePath))
