@@ -1,8 +1,8 @@
-﻿using Microsoft.Build.Locator;
-using StreamJsonRpc;
-using System.IO.Pipes;
-using Newtonsoft.Json.Serialization;
+﻿using System.IO.Pipes;
 using EasyDotnet.MsBuildSdk.Controllers;
+using Microsoft.Build.Locator;
+using Newtonsoft.Json.Serialization;
+using StreamJsonRpc;
 
 namespace EasyDotnet.MsBuildSdk;
 
