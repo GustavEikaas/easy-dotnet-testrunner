@@ -6,7 +6,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dotnet-easydotnet</ToolCommandName>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.5</Version>
+    <Version>1.0.6</Version>
     <Authors>Gustav Eikaas</Authors>
     <PackageId>EasyDotnet</PackageId>
     <Nullable>enable</Nullable>
@@ -16,11 +16,19 @@
   </PropertyGroup>
   <PropertyGroup>
     <MsBuildSdkSource>..\EasyDotnet.MsBuildSdk\bin\Release\net8.0\**\*</MsBuildSdkSource>
+    <MsBuildFrameworkSource>..\EasyDotnet.MsBuildFramework\bin\Release\net472\**\*</MsBuildFrameworkSource>
   </PropertyGroup>
 
   <Target Name="CopyAndIncludeSdkFiles" AfterTargets="Build">
     <ItemGroup>
       <None Include="$(MsBuildSdkSource)" Pack="true" PackagePath="tools/net8.0/any/MsBuildSdk" />
+    </ItemGroup>
+  </Target>
+
+
+  <Target Name="CopyAndIncludeFrameworkFiles" AfterTargets="Build">
+    <ItemGroup>
+      <None Include="$(MsBuildFrameworkSource)" Pack="true" PackagePath="tools/net8.0/any/MsBuildFramework" />
     </ItemGroup>
   </Target>
 
