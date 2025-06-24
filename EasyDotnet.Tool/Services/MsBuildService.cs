@@ -9,8 +9,8 @@ public class MsBuildService(IMsBuildHostManager manager)
   public async Task<BuildResult> RequestBuildAsync(string targetPath, string configuration, CancellationToken cancellationToken = default)
   {
     //TODO: resolve sdk/framework relation and start appropriate server
-    var x = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
-    var result = await x.BuildAsync(targetPath, configuration);
+    var sdkBuildHost = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
+    var result = await sdkBuildHost.BuildAsync(targetPath, configuration);
     return result;
   }
 }
