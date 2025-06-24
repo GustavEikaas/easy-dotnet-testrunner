@@ -137,11 +137,11 @@ public static class BuildServerStarter
 #if DEBUG
     var exePath = Path.Combine(
         dir,
-        "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", GetExecutable("EasyDotnet.MsBuildSdk"));
+        "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", "EasyDotnet.MsBuildSdk.dll");
 #else
     var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
     Console.WriteLine(exeHost);
-    var exePath = Path.Combine(exeHost, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));
+    var exePath = Path.Combine(exeHost, "MsBuildSdk", "EasyDotnet.MsBuildSdk.dll");
     Console.WriteLine(exePath);
 #endif
 
@@ -152,8 +152,8 @@ public static class BuildServerStarter
 
     var startInfo = new ProcessStartInfo
     {
-      FileName = exePath,
-      Arguments = pipeName,
+      FileName = "dotnet",
+      Arguments = $"\"{exePath}\" {pipeName}",
       UseShellExecute = false,
       RedirectStandardOutput = true,
       RedirectStandardError = true,
@@ -167,6 +167,4 @@ public static class BuildServerStarter
 
     return process;
   }
-
-  private static string GetExecutable(string name) => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? $"{name}.exe" : name;
 }
