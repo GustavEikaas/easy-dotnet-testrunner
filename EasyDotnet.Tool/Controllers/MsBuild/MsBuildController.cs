@@ -1,13 +1,5 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Pipes;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using EasyDotnet.MsBuild.Contracts;
 using EasyDotnet.Services;
-using EasyDotnet.Utils;
-using Newtonsoft.Json.Serialization;
 using StreamJsonRpc;
 
 namespace EasyDotnet.Controllers.MsBuild;
@@ -23,4 +15,3 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
     return new(result.Success);
   }
 }
-

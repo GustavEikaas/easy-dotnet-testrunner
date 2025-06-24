@@ -38,9 +38,9 @@ public static class JsonRpcServerBuilder
   private static void EnableTracingIfNeeded(JsonRpc jsonRpc)
   {
 #if DEBUG
-    // var ts = jsonRpc.TraceSource;
-    // ts.Switch.Level = SourceLevels.Verbose;
-    // ts.Listeners.Add(new ConsoleTraceListener());
+    var ts = jsonRpc.TraceSource;
+    ts.Switch.Level = SourceLevels.Verbose;
+    ts.Listeners.Add(new ConsoleTraceListener());
 #endif
   }
 }

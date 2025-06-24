@@ -10,7 +10,7 @@ using EasyDotnet.Utils;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnet_e5422cd1781a40588ddf2642de873247";
+  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
 
   public static async Task<int> Main(string[] args)
   {
