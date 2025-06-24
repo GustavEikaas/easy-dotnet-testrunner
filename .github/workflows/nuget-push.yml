@@ -25,7 +25,7 @@ jobs:
         run: dotnet build -c Release --no-restore
 
       - name: Pack
-        run: dotnet pack -c Release --no-build
+        run: dotnet pack ./EasyDotnet.Tool
 
       - name: Push to NuGet (ignore conflict errors)
         run: |
