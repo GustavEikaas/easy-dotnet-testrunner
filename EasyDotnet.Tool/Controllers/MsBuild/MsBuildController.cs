@@ -17,19 +17,29 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
   [JsonRpcMethod("msbuild/build")]
   public async Task<BuildResultResponse> Build(BuildRequest request)
   {
+    Console.WriteLine("Started: " + request.TargetPath);
     var x = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
     var result = await x.BuildAsync(request.TargetPath, request.ConfigurationOrDefault);
+
+    Console.WriteLine($"Finished: {request.TargetPath} - " + (result.Success ? "Success" : "Fail"));
     return new(result.Success);
   }
 }
 
 
-public class BuildClient(string pipeName)
+public class BuildClient
 {
   private JsonRpc? _rpc;
   private Process? _serverProcess;
   private Task? _connectTask;
   private readonly object _connectLock = new();
+  private readonly string _pipeName;
+
+  public BuildClient(string pipeName)
+  {
+    Console.WriteLine("SPAWNING " + pipeName);
+    _pipeName = pipeName;
+  }
 
   public Task ConnectAsync(bool ensureServerStarted = true)
   {
@@ -44,11 +54,11 @@ public class BuildClient(string pipeName)
   {
     if (ensureServerStarted)
     {
-      _serverProcess = BuildServerStarter.StartBuildServer(pipeName);
+      _serverProcess = BuildServerStarter.StartBuildServer(_pipeName);
       await Task.Delay(1000);
     }
 
-    var stream = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+    var stream = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
     await stream.ConnectAsync();
 
     var jsonMessageFormatter = new JsonMessageFormatter
@@ -92,7 +102,7 @@ public static class BuildServerStarter
 #if DEBUG
     var exePath = Path.Combine(
         dir,
-        "EasyDotnet.MsBuildSdk", "bin", "Debug", "net9.0", GetExecutable("EasyDotnet.MsBuildSdk"));
+        "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", GetExecutable("EasyDotnet.MsBuildSdk"));
 #else
     var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
     var exePath = Path.Combine(exeHost, "MsBuildSdk", GetExecutable("EasyDotnet.MsBuildSdk"));

@@ -19,8 +19,8 @@ public interface IBuildClientManager
 public class BuildClientManager : IBuildClientManager, IDisposable
 {
   private const int MaxPipeNameLength = 104;
-  private string _sdk_Pipe = GeneratePipeName(BuildClientType.Sdk);
-  private string _framework_Pipe = GeneratePipeName(BuildClientType.Framework);
+  private readonly string _sdk_Pipe = GeneratePipeName(BuildClientType.Sdk);
+  private readonly string _framework_Pipe = GeneratePipeName(BuildClientType.Framework);
 
   private readonly ConcurrentDictionary<string, BuildClient> _buildClientCache = new();
 
