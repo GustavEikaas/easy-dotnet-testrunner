@@ -3,13 +3,14 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Threading.Tasks;
 using EasyDotnet.MsBuild.Contracts;
 using EasyDotnet.Utils;
 using Newtonsoft.Json.Serialization;
 using StreamJsonRpc;
 
-namespace EasyDotnet.Controllers.MsBuild;
+namespace EasyDotnet.Services;
 
 public enum BuildClientType
 {
@@ -54,10 +55,7 @@ public class MsBuildHostManager : IMsBuildHostManager, IDisposable
 
   public void StopAll()
   {
-    foreach (var dict in _buildClientCache.Values)
-    {
-      dict.StopServer();
-    }
+    _buildClientCache.Values.ToList().ForEach(x => x.StopServer());
     _buildClientCache.Clear();
   }
 

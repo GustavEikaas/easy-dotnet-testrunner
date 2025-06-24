@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using EasyDotnet.Controllers.MsBuild;
 using EasyDotnet.MsBuild.Contracts;
 
 namespace EasyDotnet.Services;

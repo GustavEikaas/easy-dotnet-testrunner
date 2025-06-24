@@ -1,6 +1,5 @@
 using System.IO.Abstractions;
 using DotNetOutdated.Core.Services;
-using EasyDotnet.Controllers.MsBuild;
 using EasyDotnet.Services;
 using EasyDotnet.Utils;
 using Microsoft.Extensions.DependencyInjection;
