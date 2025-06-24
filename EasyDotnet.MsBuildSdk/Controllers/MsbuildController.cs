@@ -22,7 +22,7 @@ public class MsbuildController
 
     var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
 
-    return new MsBuild.Contracts.BuildResult(Success: result.OverallResult == BuildResultCode.Success, logger.Errors, logger.Warnings);
+    return new MsBuild.Contracts.BuildResult(result.OverallResult == BuildResultCode.Success, logger.Errors, logger.Warnings);
   }
 }
 
