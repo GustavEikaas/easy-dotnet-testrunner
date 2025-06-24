@@ -22,21 +22,22 @@ public class MsbuildController
 
     var result = BuildManager.DefaultBuildManager.Build(parameters, buildRequest);
 
-    return new MsBuild.Contracts.BuildResult(Success: result.OverallResult == BuildResultCode.Success, logger.Messages);
+    return new MsBuild.Contracts.BuildResult(Success: result.OverallResult == BuildResultCode.Success, logger.Errors, logger.Warnings);
   }
 }
 
 public class InMemoryLogger : ILogger
 {
-  public List<BuildMessage> Messages { get; } = [];
+  public List<BuildMessage> Errors { get; } = [];
+  public List<BuildMessage> Warnings { get; } = [];
 
   public LoggerVerbosity Verbosity { get; set; } = LoggerVerbosity.Normal;
   public string? Parameters { get; set; }
 
   public void Initialize(IEventSource eventSource)
   {
-    eventSource.ErrorRaised += (sender, args) => Messages.Add(new BuildMessage("error", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
-    eventSource.WarningRaised += (sender, args) => Messages.Add(new BuildMessage("warning", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
+    eventSource.ErrorRaised += (sender, args) => Errors.Add(new BuildMessage("error", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
+    eventSource.WarningRaised += (sender, args) => Warnings.Add(new BuildMessage("warning", args.File, args.LineNumber, args.ColumnNumber, args.Code, args?.Message));
   }
 
   public void Shutdown() { }

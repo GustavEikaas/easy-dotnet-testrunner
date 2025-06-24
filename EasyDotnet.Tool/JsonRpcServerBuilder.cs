@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using EasyDotnet.Controllers.MsBuild;
 using EasyDotnet.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
@@ -19,6 +19,8 @@ public static class JsonRpcServerBuilder
     var sp = buildServiceProvider is not null ? buildServiceProvider(jsonRpc) : DiModules.BuildServiceProvider(jsonRpc);
     RegisterControllers(jsonRpc, sp);
     EnableTracingIfNeeded(jsonRpc);
+
+    jsonRpc.Completion.ContinueWith(x => sp.GetRequiredService<IBuildClientManager>().StopAll());
 
     return jsonRpc;
   }

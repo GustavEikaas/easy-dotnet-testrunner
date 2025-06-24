@@ -17,11 +17,9 @@ public class MsBuildController(ClientService clientService, MsBuildService msBui
   [JsonRpcMethod("msbuild/build")]
   public async Task<BuildResultResponse> Build(BuildRequest request)
   {
-    Console.WriteLine("Started: " + request.TargetPath);
     var x = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
     var result = await x.BuildAsync(request.TargetPath, request.ConfigurationOrDefault);
 
-    Console.WriteLine($"Finished: {request.TargetPath} - " + (result.Success ? "Success" : "Fail"));
     return new(result.Success);
   }
 }
