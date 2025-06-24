@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using EasyDotnet.MsBuild.Contracts;
 using EasyDotnet.Utils;
