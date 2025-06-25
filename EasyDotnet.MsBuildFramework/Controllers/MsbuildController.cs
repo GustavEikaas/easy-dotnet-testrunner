@@ -14,7 +14,15 @@ namespace EasyDotnet.MsBuildFramework.Controllers
     [JsonRpcMethod("msbuild/build")]
     public MsBuild.Contracts.BuildResult RequestBuild(string targetPath, string configuration)
     {
-      var properties = new Dictionary<string, string> { { "Configuration", configuration } };
+
+      var properties = new Dictionary<string, string>
+    {
+      { "Configuration", "Debug" },
+      { "Platform", "AnyCPU" },
+      { "BuildingInsideVisualStudio", "true" },
+      { "DesignTimeBuild", "false" },
+    };
+
 
       using (var pc = new ProjectCollection())
       {
