@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using EasyDotnet.MsBuild.Contracts;
 using EasyDotnet.Utils;
+using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json.Serialization;
 using StreamJsonRpc;
 
@@ -37,9 +38,9 @@ public class MsBuildHostManager : IMsBuildHostManager, IDisposable
   {
     var client = _buildClientCache.AddOrUpdate(
     type == BuildClientType.Sdk ? _sdk_Pipe : _framework_Pipe,
-    key => new MsBuildHost(key),
+    key => new MsBuildHost(key, type),
     (key, existingClient) =>
-      existingClient ?? new MsBuildHost(key));
+      existingClient ?? new MsBuildHost(key, type));
 
     await client.ConnectAsync(ensureServerStarted: true);
     return client;
@@ -62,7 +63,7 @@ public class MsBuildHostManager : IMsBuildHostManager, IDisposable
   public void Dispose() => StopAll();
 }
 
-public class MsBuildHost(string pipeName)
+public class MsBuildHost(string pipeName, BuildClientType type)
 {
   private JsonRpc? _rpc;
   private Process? _serverProcess;
@@ -83,7 +84,7 @@ public class MsBuildHost(string pipeName)
   {
     if (ensureServerStarted)
     {
-      _serverProcess = BuildServerStarter.StartBuildServer(_pipeName);
+      _serverProcess = BuildServerStarter.StartBuildServer(_pipeName, type);
       await Task.Delay(1000);
     }
 
@@ -121,39 +122,96 @@ public class MsBuildHost(string pipeName)
 
 public static class BuildServerStarter
 {
-  public static Process StartBuildServer(string pipeName)
+  public static Process StartBuildServer(string pipeName, BuildClientType type)
   {
-    var dir = HostDirectoryUtil.HostDirectory;
-
-#if DEBUG
-    var exePath = Path.Combine(
-        dir,
-        "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", "EasyDotnet.MsBuildSdk.dll");
-#else
-    var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-    var exePath = Path.Combine(exeHost, "MsBuildSdk", "EasyDotnet.MsBuildSdk.dll");
-#endif
+    var exePath = GetExecutablePathForClientType(type);
 
     if (!File.Exists(exePath))
     {
       throw new FileNotFoundException("Build server executable not found.", exePath);
     }
+    Console.WriteLine(exePath);
 
-    var startInfo = new ProcessStartInfo
+
+    ProcessStartInfo startInfo;
+
+    if (type == BuildClientType.Framework)
     {
-      FileName = "dotnet",
-      Arguments = $"\"{exePath}\" {pipeName}",
-      UseShellExecute = false,
-      RedirectStandardOutput = true,
-      RedirectStandardError = true,
-      CreateNoWindow = true
+      // Run the .NET Framework exe directly
+      startInfo = new ProcessStartInfo
+      {
+        FileName = exePath,
+        Arguments = pipeName,
+        UseShellExecute = false,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        CreateNoWindow = true
+      };
+    }
+    else
+    {
+      // Run .NET Core/.NET SDK exe via dotnet command
+      startInfo = new ProcessStartInfo
+      {
+        FileName = "dotnet",
+        Arguments = $"\"{exePath}\" {pipeName}",
+        UseShellExecute = false,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true,
+        CreateNoWindow = true
+      };
+    }
+    var process = new Process { StartInfo = startInfo };
+
+    void ProcessExitHandler(object? sender, EventArgs e)
+    {
+      if (!process.HasExited)
+      {
+        process.Kill(true);
+      }
+      process.Dispose();
+    }
+    AppDomain.CurrentDomain.ProcessExit += ProcessExitHandler;
+
+    process.WaitForExitAsync().ContinueWith(x => AppDomain.CurrentDomain.ProcessExit -= ProcessExitHandler);
+    process.OutputDataReceived += (sender, e) =>
+    {
+      if (!string.IsNullOrEmpty(e.Data))
+        Console.WriteLine($"[STDOUT] {e.Data}");
     };
 
-    var process = new Process { StartInfo = startInfo };
+    process.ErrorDataReceived += (sender, e) =>
+    {
+      if (!string.IsNullOrEmpty(e.Data))
+        Console.WriteLine($"[STDERR] {e.Data}");
+    };
     process.Start();
+    process.BeginOutputReadLine();
+    process.BeginErrorReadLine();
 
     Console.WriteLine($"Started BuildServer from: {exePath}");
 
     return process;
+  }
+
+  private static string GetExecutablePathForClientType(BuildClientType type)
+  {
+    var dir = HostDirectoryUtil.HostDirectory;
+    var exeHost = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+    return type switch
+    {
+#if DEBUG
+      BuildClientType.Sdk => Path.Combine(dir, "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", "EasyDotnet.MsBuildSdk.dll"),
+#else
+      BuildClientType.Sdk => Path.Combine(exeHost,  "MsBuildSdk", "EasyDotnet.MsBuildSdk.dll"),
+#endif
+#if DEBUG
+      BuildClientType.Framework => Path.Combine(dir, "EasyDotnet.MsBuildFramework", "bin", "Debug", "net472", "EasyDotnet.MsBuildFramework.exe"),
+#else
+      BuildClientType.Framework => Path.Combine(exeHost,  "MsBuildFramework", "EasyDotnet.MsBuildFramework.exe"),
+#endif
+      _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+    };
   }
 }

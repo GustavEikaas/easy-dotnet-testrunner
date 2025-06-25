@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
+    <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" Version="17.14.8" />
+    <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyDotnet.MsBuild.Contracts\EasyDotnet.MsBuild.Contracts.csproj" />
+  </ItemGroup>
+</Project>
