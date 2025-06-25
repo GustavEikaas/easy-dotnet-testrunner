@@ -204,7 +204,7 @@ public static class BuildServerStarter
 #if DEBUG
       BuildClientType.Sdk => Path.Combine(dir, "EasyDotnet.MsBuildSdk", "bin", "Debug", "net8.0", "EasyDotnet.MsBuildSdk.dll"),
 #else
-      BuildClientType.Sdk => Path.Combine(exeHost,  "EasyDotnet.MsBuildSdk", "EasyDotnet.MsBuildSdk.dll"),
+      BuildClientType.Sdk => Path.Combine(exeHost,  "MsBuildSdk", "EasyDotnet.MsBuildSdk.dll"),
 #endif
 #if DEBUG
       BuildClientType.Framework => Path.Combine(dir, "EasyDotnet.MsBuildFramework", "bin", "Debug", "net472", "EasyDotnet.MsBuildFramework.exe"),
