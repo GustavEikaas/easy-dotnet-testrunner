@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 
 using EasyDotnet;
 using EasyDotnet.Utils;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using NJsonSchema;
+using NJsonSchema.CodeGeneration.CSharp;
 
 class Program
 {
-  private static readonly string PipeName = "EasyDotnet_" + Guid.NewGuid().ToString("N");
+  private static readonly string PipeName = "EasyDotnet_450fb6c20d9a401796b86f28217f0345";
 
   public static async Task<int> Main(string[] args)
   {
