@@ -11,14 +11,12 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 namespace EasyDotnet.Services;
 
-public class RoslynService(ProjectMetadataCache cache)
+public class RoslynService(RoslynProjectMetadataCache cache)
 {
-
   private async Task<ProjectCacheItem> GetOrSetProjectFromCache(string projectPath, CancellationToken cancellationToken)
   {
     if (cache.TryGet(projectPath, out var cachedProject) && cachedProject is not null)
     {
-      Console.WriteLine("cached af");
       return cachedProject;
     }
 

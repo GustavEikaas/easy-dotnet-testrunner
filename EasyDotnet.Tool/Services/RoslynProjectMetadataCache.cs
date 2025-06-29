@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace EasyDotnet.Services;
 
-public class ProjectMetadataCache
+public class RoslynProjectMetadataCache
 {
   private readonly ConcurrentDictionary<string, ProjectCacheItem> _cache = new();
 
