@@ -55,8 +55,8 @@ public class RoslynService(RoslynProjectMetadataCache cache)
             .AddMembers(typeDecl);
 
     var unit = SyntaxFactory.CompilationUnit()
-        .AddMembers(nsDeclaration)
-        .NormalizeWhitespace();
+      .AddMembers(nsDeclaration)
+      .NormalizeWhitespace(eol: Environment.NewLine);
 
     if (File.Exists(filePath) && new FileInfo(filePath).Length > 0)
     {
