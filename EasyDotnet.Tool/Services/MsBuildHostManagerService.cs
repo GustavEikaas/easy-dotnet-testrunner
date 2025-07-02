@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using EasyDotnet.MsBuild.Contracts;
 using EasyDotnet.Utils;
@@ -26,7 +27,7 @@ public interface IMsBuildHostManager
 
 public class MsBuildHostManager : IMsBuildHostManager, IDisposable
 {
-  private const int MaxPipeNameLength = 104;
+  private const int MaxPipeNameLength = 103;
   private readonly string _sdk_Pipe = GeneratePipeName(BuildClientType.Sdk);
   private readonly string _framework_Pipe = GeneratePipeName(BuildClientType.Framework);
 
@@ -49,7 +50,8 @@ public class MsBuildHostManager : IMsBuildHostManager, IDisposable
   private static string GeneratePipeName(BuildClientType type)
   {
     var pipePrefix = "EasyDotnet_MSBuild_";
-    var name = $"{pipePrefix}{type}_{Guid.NewGuid():N}";
+    var uid = Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", "");
+    var name = $"{pipePrefix}{type}_{uid}";
     return name[..Math.Min(name.Length, MaxPipeNameLength)];
   }
 
