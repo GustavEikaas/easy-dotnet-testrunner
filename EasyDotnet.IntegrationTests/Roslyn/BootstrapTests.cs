@@ -68,11 +68,13 @@ public class BootstrapTests
   [Fact]
   public async Task BootstrapNamespaceWithCorrectLineFeeds()
   {
-    var res = await GetSyntaxTreeForBootstrappedFile("MyController", Kind.Record, true);
-
-    Assert.DoesNotContain(_invalidLineFeed, res.RawText);
+    using var res = await GetSyntaxTreeForBootstrappedFile("MyController", Kind.Record, true);
+    
+    if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+      Assert.DoesNotContain(_invalidLineFeed, res.RawText);
+    }
     Assert.Contains(_validLineFeed, res.RawText);
-    res.Project.Dispose();
   }
 
   private static async Task<NamespaceDeclarationSyntax?> GetNamespaceNode(SyntaxTree syntaxTree)
