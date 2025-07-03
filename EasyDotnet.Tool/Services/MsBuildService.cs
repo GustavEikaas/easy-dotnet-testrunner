@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using EasyDotnet.MsBuild.Contracts;
@@ -11,6 +13,7 @@ public class MsBuildService(IMsBuildHostManager manager)
     //TODO: resolve sdk/framework relation and start appropriate server
     var sdkBuildHost = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
     var result = await sdkBuildHost.BuildAsync(targetPath, configuration);
+    Console.WriteLine(string.Join(".", result.Errors));
     return result;
   }
 }

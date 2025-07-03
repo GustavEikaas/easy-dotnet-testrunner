@@ -1,4 +1,5 @@
-﻿using System.IO.Pipes;
+﻿using System.Diagnostics;
+using System.IO.Pipes;
 using EasyDotnet.MsBuildSdk.Controllers;
 using Microsoft.Build.Locator;
 using Newtonsoft.Json.Serialization;
@@ -45,6 +46,9 @@ class Program
     var jsonRpc = new JsonRpc(handler);
     jsonRpc.AddLocalRpcTarget(new MsbuildController());
 
+    var ts = jsonRpc.TraceSource;
+    ts.Switch.Level = SourceLevels.Verbose;
+    ts.Listeners.Add(new ConsoleTraceListener());
     jsonRpc.StartListening();
     Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
     await jsonRpc.Completion;
