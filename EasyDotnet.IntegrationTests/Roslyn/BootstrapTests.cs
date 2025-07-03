@@ -69,7 +69,7 @@ public class BootstrapTests
   public async Task BootstrapNamespaceWithCorrectLineFeeds()
   {
     using var res = await GetSyntaxTreeForBootstrappedFile("MyController", Kind.Record, true);
-    
+
     if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     {
       Assert.DoesNotContain(_invalidLineFeed, res.RawText);
