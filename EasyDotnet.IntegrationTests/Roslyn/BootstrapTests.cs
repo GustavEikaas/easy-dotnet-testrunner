@@ -21,7 +21,7 @@ public class BootstrapTests
   [InlineData(Kind.Interface, true)]
   public async Task BootstrapCreatesCorrectKind(Kind kind, bool preferFileScopedNamespace)
   {
-    using var res = await GetSyntaxTreeForBootstrappedFile(kind == Kind.Interface ? "IMyController" : "MyController", Kind.Record, preferFileScopedNamespace);
+    using var res = await GetSyntaxTreeForBootstrappedFile(kind == Kind.Interface ? "IMyController" : "MyController", kind, preferFileScopedNamespace);
 
     BaseNamespaceDeclarationSyntax? ns = preferFileScopedNamespace ? await GetFileScopedNamespaceNode(res.SyntaxTree) : await GetNamespaceNode(res.SyntaxTree);
     Assert.NotNull(ns);
