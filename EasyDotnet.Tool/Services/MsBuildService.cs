@@ -13,4 +13,11 @@ public class MsBuildService(IMsBuildHostManager manager)
     var result = await sdkBuildHost.BuildAsync(targetPath, configuration);
     return result;
   }
+
+  public async Task<DotnetProjectProperties> QueryProjectPropertiesAsync(string targetPath, string configuration, string? targetFramework)
+  {
+    var sdkBuildHost = await manager.GetOrStartClientAsync(BuildClientType.Sdk);
+    var result = await sdkBuildHost.QueryProjectProperties(targetPath, configuration, targetFramework);
+    return result;
+  }
 }

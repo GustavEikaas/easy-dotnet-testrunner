@@ -104,13 +104,36 @@ public class MsBuildHost(string pipeName)
     _rpc.StartListening();
   }
 
-  public async Task<BuildResult> BuildAsync(string targetPath, string configuration)
+  private async Task<T> InvokeRpcAsync<T>(string methodName, object request)
   {
     if (_rpc == null)
       throw new InvalidOperationException("BuildClient not connected.");
 
+    try
+    {
+      return await _rpc.InvokeWithParameterObjectAsync<T>(methodName, request);
+    }
+    catch (RemoteMethodNotFoundException ex)
+    {
+      throw new Exception($"RemoteMethodNotFoundException for MsBuildSdk: {methodName}", ex);
+    }
+    catch (Exception ex)
+    {
+      throw new Exception($"Rip exception for MsBuildSdk: {methodName}", ex);
+    }
+
+  }
+
+  public async Task<DotnetProjectProperties> QueryProjectProperties(string targetPath, string configuration, string? targetFramework)
+  {
+    var request = new { TargetPath = targetPath, Configuration = configuration, TargetFramework = targetFramework ?? "" };
+    return await InvokeRpcAsync<DotnetProjectProperties>("msbuild/query-properties", request);
+  }
+
+  public async Task<BuildResult> BuildAsync(string targetPath, string configuration)
+  {
     var request = new { TargetPath = targetPath, Configuration = configuration };
-    return await _rpc.InvokeWithParameterObjectAsync<BuildResult>("msbuild/build", request);
+    return await InvokeRpcAsync<BuildResult>("msbuild/build", request);
   }
 
   public void StopServer()
@@ -153,7 +176,27 @@ public static class BuildServerStarter
       CreateNoWindow = true
     };
 
+
     var process = new Process { StartInfo = startInfo };
+
+#if DEBUG
+    process.OutputDataReceived += (sender, args) =>
+    {
+      if (!string.IsNullOrWhiteSpace(args.Data))
+      {
+        Console.WriteLine($"##SDK_STDOUT::{args.Data}");
+      }
+    };
+
+    process.ErrorDataReceived += (sender, args) =>
+    {
+      if (!string.IsNullOrWhiteSpace(args.Data))
+      {
+        Console.Error.WriteLine($"##SDK_STDERR::{args.Data}");
+      }
+    };
+#endif
+
     process.Start();
 
     Console.WriteLine($"Started BuildServer from: {exePath}");

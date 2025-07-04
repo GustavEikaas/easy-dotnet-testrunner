@@ -12,6 +12,8 @@
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
     <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" Version="15.1.548" />
     <PackageReference Include="StreamJsonRpc" Version="2.21.69" />
+    <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>

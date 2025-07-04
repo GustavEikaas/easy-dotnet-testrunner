@@ -37,6 +37,8 @@ public static class DiModules
     services.AddSingleton<INuGetPackageInfoService, NuGetPackageInfoService>();
     services.AddSingleton<INuGetPackageResolutionService, NuGetPackageResolutionService>();
 
+    services.AddFusionCache();
+
     AssemblyScanner.GetControllerTypes().ForEach(x => services.AddTransient(x));
 
     return services.BuildServiceProvider();

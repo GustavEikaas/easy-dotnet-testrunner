@@ -1,8 +1,5 @@
 ﻿using System.IO.Pipes;
-using EasyDotnet.MsBuildSdk.Controllers;
 using Microsoft.Build.Locator;
-using Newtonsoft.Json.Serialization;
-using StreamJsonRpc;
 
 namespace EasyDotnet.MsBuildSdk;
 
@@ -35,19 +32,9 @@ class Program
 
   private static async Task RespondToRpcRequestsAsync(Stream stream, int clientId)
   {
-    var jsonMessageFormatter = new JsonMessageFormatter();
-    jsonMessageFormatter.JsonSerializer.ContractResolver = new DefaultContractResolver
-    {
-      NamingStrategy = new CamelCaseNamingStrategy(),
-    };
-
-    var handler = new HeaderDelimitedMessageHandler(stream, stream, jsonMessageFormatter);
-    var jsonRpc = new JsonRpc(handler);
-    jsonRpc.AddLocalRpcTarget(new MsbuildController());
-
-    jsonRpc.StartListening();
-    Console.WriteLine($"JSON-RPC listener attached to #{clientId}. Waiting for requests...");
-    await jsonRpc.Completion;
+    var rpc = JsonRpcServerBuilder.Build(stream, stream);
+    rpc.StartListening();
+    await rpc.Completion;
     await Console.Error.WriteLineAsync($"Connection #{clientId} terminated.");
   }
 }
